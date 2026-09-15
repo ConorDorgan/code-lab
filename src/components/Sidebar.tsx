@@ -27,6 +27,7 @@ export default function Sidebar({ builtInCourses }: Props) {
   const [customCourses, setCustomCourses] = useState<Course[]>([]);
   const [showDialog, setShowDialog] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   // Track which courses are manually expanded; active course always expanded
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
@@ -61,29 +62,66 @@ export default function Sidebar({ builtInCourses }: Props) {
 
   const sidebarContent = (
     <aside
-      className="flex flex-col h-full w-[220px] shrink-0 border-r"
-      style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}
+      className="flex flex-col h-full shrink-0 border-r transition-[width] duration-200"
+      style={{
+        background: 'var(--surface-2)',
+        borderColor: 'var(--border)',
+        width: collapsed ? '44px' : '220px',
+        overflow: 'hidden',
+      }}
     >
       {/* Header */}
       <div
-        className="flex items-center justify-between px-4 h-11 border-b shrink-0"
+        className="flex items-center justify-between px-2 h-11 border-b shrink-0"
         style={{ borderColor: 'var(--border)' }}
       >
-        <Link
-          href="/"
-          onClick={() => setMobileOpen(false)}
-          className="font-mono text-xs font-semibold tracking-widest uppercase transition-colors duration-100"
-          style={{ color: 'var(--text-muted)' }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text)')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
-        >
-          code-lab
-        </Link>
-        <ThemeToggle />
+        {!collapsed && (
+          <Link
+            href="/"
+            onClick={() => setMobileOpen(false)}
+            className="font-mono text-xs font-semibold tracking-widest uppercase transition-colors duration-100 pl-2"
+            style={{ color: 'var(--text-muted)' }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+          >
+            code-lab
+          </Link>
+        )}
+        <div className={`flex items-center gap-1 ${collapsed ? 'w-full justify-center' : ''}`}>
+          {!collapsed && <ThemeToggle />}
+          <button
+            onClick={() => setCollapsed((v) => !v)}
+            className="w-7 h-7 flex items-center justify-center font-mono text-xs transition-colors duration-100"
+            style={{ color: 'var(--text-muted)' }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {collapsed ? '›' : '‹'}
+          </button>
+        </div>
       </div>
 
+      {/* Collapsed state — icon strip */}
+      {collapsed && (
+        <div className="flex flex-col items-center gap-2 py-3 flex-1">
+          <Link
+            href="/"
+            title="All courses"
+            className="w-7 h-7 flex items-center justify-center font-mono text-xs transition-colors duration-100"
+            style={{ color: 'var(--text-muted)' }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+          >
+            ⊞
+          </Link>
+          <ThemeToggle />
+        </div>
+      )}
+
       {/* Course list */}
-      <nav className="flex-1 overflow-y-auto py-2" aria-label="Lessons">
+      <nav className={`flex-1 overflow-y-auto py-2 ${collapsed ? 'hidden' : ''}`} aria-label="Lessons">
         {/* Dashboard link */}
         <div className="px-4 pb-2 pt-1">
           <Link
@@ -187,7 +225,7 @@ export default function Sidebar({ builtInCourses }: Props) {
       </nav>
 
       {/* Add course */}
-      <div className="shrink-0 p-3 border-t" style={{ borderColor: 'var(--border)' }}>
+      <div className={`shrink-0 p-3 border-t ${collapsed ? 'hidden' : ''}`} style={{ borderColor: 'var(--border)' }}>
         <button
           onClick={() => setShowDialog(true)}
           className="w-full flex items-center gap-2 px-3 py-2 font-mono text-xs border transition-colors duration-150 text-left"
