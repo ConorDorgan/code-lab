@@ -1,11 +1,14 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import type { Course, Lesson } from '@/lib/lessons/types';
 import LessonView from '@/components/LessonView';
 import CodeEditor from '@/components/CodeEditor';
 import OutputPanel from '@/components/OutputPanel';
 import { useRunner } from '@/lib/runners/useRunner';
+
+const AIChat = dynamic(() => import('@/components/AIChat'), { ssr: false });
 
 interface Props {
   course: Course;
@@ -15,17 +18,20 @@ interface Props {
 const LANG_LABEL: Record<string, string> = { python: 'python', sql: 'sql' };
 
 export default function LessonPageClient({ course, lesson }: Props) {
-  const starter  = lesson.blocks.find((b) => b.role === 'starter')?.code ?? '';
-  const solution = lesson.blocks.find((b) => b.role === 'solution')?.code ?? '';
-  const expected = lesson.blocks.find((b) => b.role === 'expected')?.code ?? '';
-  const setup    = lesson.blocks.find((b) => b.role === 'setup')?.code;
+  const starter     = lesson.blocks.find((b) => b.role === 'starter')?.code ?? '';
+  const solution    = lesson.blocks.find((b) => b.role === 'solution')?.code ?? '';
+  const expected    = lesson.blocks.find((b) => b.role === 'expected')?.code ?? '';
+  const setup       = lesson.blocks.find((b) => b.role === 'setup')?.code;
+  const explanation = lesson.blocks.find((b) => b.role === 'explanation')?.code ?? '';
 
   const [code, setCode] = useState(starter);
   const [showSolution, setShowSolution] = useState(false);
   const [activeEditor, setActiveEditor] = useState<'code' | 'solution'>('code');
+  const [outputTab, setOutputTab] = useState<'output' | 'ai'>('output');
   const { run, status, result } = useRunner(course.language);
 
   async function handleRun() {
+    setOutputTab('output');
     await run(activeEditor === 'solution' ? solution : code, setup);
   }
 
@@ -104,6 +110,24 @@ export default function LessonPageClient({ course, lesson }: Props) {
               >
                 {expected}
               </pre>
+            </div>
+          )}
+
+          {/* Solution explanation — shown when solution is visible */}
+          {showSolution && explanation && (
+            <div className="mt-6 pt-5 border-t" style={{ borderColor: 'var(--border)' }}>
+              <p
+                className="font-mono text-[10px] uppercase tracking-widest mb-3"
+                style={{ color: 'var(--accent)' }}
+              >
+                why this works
+              </p>
+              <p
+                className="font-mono text-xs leading-relaxed"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                {explanation}
+              </p>
             </div>
           )}
         </div>
@@ -192,30 +216,53 @@ export default function LessonPageClient({ course, lesson }: Props) {
           />
         </div>
 
-        {/* Output panel */}
+        {/* Output + AI panel */}
         <div
           className="shrink-0 border-t flex flex-col"
-          style={{ height: '180px', borderColor: 'rgba(255,255,255,0.08)' }}
+          style={{ height: '220px', borderColor: 'rgba(255,255,255,0.08)' }}
         >
-          {/* Output header */}
+          {/* Panel tabs */}
           <div
-            className="h-7 shrink-0 flex items-center px-3 border-b gap-3"
+            className="h-7 shrink-0 flex items-center border-b"
             style={{ borderColor: 'rgba(255,255,255,0.08)' }}
           >
-            <span className="font-mono text-[10px] uppercase tracking-widest" style={{ color: 'var(--terminal-dim)' }}>
+            <button
+              onClick={() => setOutputTab('output')}
+              className="font-mono text-[10px] uppercase tracking-widest px-3 h-7 border-b-2 transition-colors duration-150"
+              style={{
+                color: outputTab === 'output' ? 'var(--terminal-txt)' : 'var(--terminal-dim)',
+                borderBottomColor: outputTab === 'output' ? 'var(--accent)' : 'transparent',
+              }}
+            >
               output
-            </span>
-            {result && (
-              <span
-                className="font-mono text-[10px]"
-                style={{ color: result.error ? '#f87171' : '#4ade80' }}
-              >
-                {result.error ? '● error' : '● ok'}
-              </span>
-            )}
+              {result && (
+                <span
+                  className="ml-1.5 text-[9px]"
+                  style={{ color: result.error ? '#f87171' : '#4ade80' }}
+                >
+                  {result.error ? '●' : '●'}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setOutputTab('ai')}
+              className="font-mono text-[10px] uppercase tracking-widest px-3 h-7 border-b-2 transition-colors duration-150"
+              style={{
+                color: outputTab === 'ai' ? 'var(--terminal-txt)' : 'var(--terminal-dim)',
+                borderBottomColor: outputTab === 'ai' ? 'var(--accent)' : 'transparent',
+              }}
+            >
+              ai chat
+            </button>
           </div>
+
+          {/* Panel content */}
           <div className="flex-1 min-h-0 overflow-hidden">
-            <OutputPanel status={status} result={result} />
+            {outputTab === 'output' ? (
+              <OutputPanel status={status} result={result} />
+            ) : (
+              <AIChat course={course} lesson={lesson} />
+            )}
           </div>
         </div>
       </div>

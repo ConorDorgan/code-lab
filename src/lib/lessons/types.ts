@@ -2,7 +2,7 @@ export type Language = 'python' | 'sql';
 
 export interface CodeBlock {
   lang: Language | 'text';
-  role: 'starter' | 'solution' | 'expected' | 'setup';
+  role: 'starter' | 'solution' | 'expected' | 'setup' | 'explanation';
   code: string;
 }
 

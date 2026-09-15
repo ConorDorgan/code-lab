@@ -10,7 +10,7 @@ function parseLessonBody(raw: string): { prose: string; blocks: CodeBlock[] } {
   // Extract fenced code blocks whose info string has a second token (the role)
   const fenceRe = /^```(\S+)\s+(\S+)\s*\n([\s\S]*?)^```/gm;
   const prose = raw.replace(fenceRe, (_, lang: string, role: string, code: string) => {
-    const validRoles = ['starter', 'solution', 'expected', 'setup'];
+    const validRoles = ['starter', 'solution', 'expected', 'setup', 'explanation'];
     if (validRoles.includes(role)) {
       blocks.push({ lang: lang as CodeBlock['lang'], role: role as CodeBlock['role'], code: code.trimEnd() });
       return ''; // remove from prose

@@ -18,6 +18,10 @@ print("Hello, World!")
 print("Hello, World!")
 ```
 
+```text explanation
+`print()` is a built-in function that writes its arguments to stdout followed by a newline. You call it by writing the function name, then passing the value you want to display in parentheses. String literals (text) must be wrapped in matching quote characters — either single `'` or double `"`.
+```
+
 ```text expected
 Hello, World!
 ```
@@ -56,6 +60,10 @@ print(name, type(name))
 print(is_learning, type(is_learning))
 ```
 
+```text explanation
+Python uses *dynamic typing* — you never declare a type explicitly; Python infers it from the value you assign. `type()` returns a type object like `<class 'int'>`. Each call to `print()` here passes two arguments separated by a comma; `print` separates them with a space by default. This pattern — store a value, then inspect it with `type()` — is a useful habit when learning what Python expects.
+```
+
 # Lesson: f-Strings
 
 f-strings let you embed expressions directly in a string. Prefix the string with `f` and wrap expressions in `{}`.
@@ -70,6 +78,10 @@ name = "world"
 print(f"Hello, {name}!")
 # You can embed any expression
 print(f"2 + 2 = {2 + 2}")
+```
+
+```text explanation
+An f-string (formatted string literal) is created by placing `f` immediately before the opening quote. Any expression inside `{}` is evaluated at runtime and converted to a string. This is cleaner than concatenation with `+` because you can see the structure of the output directly. You can put any valid Python expression inside `{}` — not just variable names, but arithmetic, function calls, or even conditionals.
 ```
 
 ```text expected
@@ -98,6 +110,10 @@ fruits.append("date")
 print(fruits)
 ```
 
+```text explanation
+Lists in Python are zero-indexed, so the first item is at index `0`. Negative indices count from the end: `fruits[-1]` gives the last item without needing to know the length. `len()` returns the number of items. `.append()` adds an item to the end of the list, mutating it in place — the list itself changes rather than a new one being created. This mutability is a key property of lists, distinguishing them from tuples.
+```
+
 # Lesson: For Loops
 
 Use `for` to iterate over any sequence — a list, a string, or a `range`.
@@ -115,6 +131,10 @@ for fruit in fruits:
 # range gives a sequence of numbers
 for i in range(5):
     print(i)
+```
+
+```text explanation
+A `for` loop binds a variable (here `fruit` or `i`) to each item in a sequence in turn, then runs the indented block of code. Python uses indentation (4 spaces by convention) to define blocks — there are no curly braces. `range(5)` produces the sequence `0, 1, 2, 3, 4`; it stops *before* the number you pass in. You can loop over any iterable: lists, strings, tuples, dicts, and more.
 ```
 
 ```text expected
@@ -149,6 +169,10 @@ else:
     print("Fail")
 ```
 
+```text explanation
+Python evaluates `if` conditions top to bottom and runs the first block whose condition is `True`. `elif` (short for "else if") checks an additional condition only when all previous conditions were `False`. `else` catches everything that didn't match. Conditions use comparison operators: `>=` (greater than or equal), `==` (equal), `!=` (not equal), `<`, `>`, `<=`. Only one branch ever runs — once a match is found, the rest are skipped.
+```
+
 ```text expected
 Pass
 ```
@@ -167,6 +191,10 @@ def greet(name: str) -> str:
 
 print(greet("Conor"))
 print(greet("World"))
+```
+
+```text explanation
+`def` declares a function. The parameter list in parentheses names the inputs. Python supports optional *type hints* (`name: str` and `-> str`) that document what types the function expects and returns — they don't enforce anything at runtime but help you and your editor understand the code. `return` sends a value back to the caller. Once defined, you call the function by its name followed by arguments in parentheses; each call runs the function body independently.
 ```
 
 ```text expected
@@ -196,6 +224,10 @@ for key, value in person.items():
     print(f"{key}: {value}")
 ```
 
+```text explanation
+Dictionaries store key-value pairs. Access a value with `dict[key]` — if the key doesn't exist this raises a `KeyError`. `.get(key, default)` is safer: it returns the default instead of raising an error. `.items()` returns all key-value pairs as tuples, which you can unpack into two variables in a `for` loop. Dictionary keys must be *hashable* (strings, numbers, and tuples work; lists do not). Since Python 3.7, dictionaries preserve insertion order.
+```
+
 # Lesson: List Comprehensions
 
 List comprehensions offer a concise way to build lists.
@@ -221,4 +253,8 @@ print(evens)
 # Squares of odd numbers
 odd_squares = [n**2 for n in numbers if n % 2 != 0]
 print(odd_squares)
+```
+
+```text explanation
+A list comprehension packs a `for` loop and optional `if` filter into a single expression: `[expression for item in iterable if condition]`. The result is a new list — the original is not modified. `%` is the modulo operator (remainder after division), so `n % 2 == 0` is `True` for even numbers. `**` is the exponentiation operator (`n**2` means n squared). Comprehensions are idiomatic Python — prefer them over explicit `append` loops for simple transformations and filters.
 ```

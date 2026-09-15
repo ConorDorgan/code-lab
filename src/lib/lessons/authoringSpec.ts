@@ -34,8 +34,11 @@ Each lesson body can contain:
 |------|---------|--------|
 | \`starter\` | Code pre-loaded in the editor | \`\`\`python starter |
 | \`solution\` | Revealed when user clicks "Show solution" | \`\`\`python solution |
+| \`explanation\` | Plain-English explanation of the solution, shown below the solution code | \`\`\`text explanation |
 | \`expected\` | Expected output shown as target | \`\`\`text expected |
 | \`setup\` | SQL only — DDL/DML run before user code | \`\`\`sql setup |
+
+**Always write an \`explanation\` block alongside every \`solution\` block.** This is shown to learners who look at the solution but still don't understand it. Write it as 2–4 plain-English sentences that explain *why* the solution works, not just *what* it does. Mention key concepts by name so the learner knows what to search for next.
 
 Only blocks with a recognised role are extracted; all others render as normal code blocks in the lesson prose.
 
@@ -60,6 +63,10 @@ print(name)
 \`\`\`python solution
 name = "world"
 print(f"Hello, {name}!")
+\`\`\`
+
+\`\`\`text explanation
+An f-string (formatted string literal) lets you embed any Python expression directly inside a string by prefixing it with \`f\` and wrapping expressions in \`{}\`. Here, \`{name}\` is replaced with the value of the variable \`name\` at runtime. This is the modern, preferred alternative to string concatenation or \`.format()\`.
 \`\`\`
 
 \`\`\`text expected
