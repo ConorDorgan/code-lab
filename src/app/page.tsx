@@ -1,11 +1,7 @@
-import { redirect } from 'next/navigation';
 import { getBuiltInCourses } from '@/lib/lessons/builtIn';
+import DashboardClient from '@/components/DashboardClient';
 
 export default function Home() {
-  const courses = getBuiltInCourses();
-  const first = courses[0];
-  if (first && first.lessons[0]) {
-    redirect(`/learn/${first.id}/${first.lessons[0].id}`);
-  }
-  return null;
+  const builtInCourses = getBuiltInCourses();
+  return <DashboardClient builtInCourses={builtInCourses} />;
 }
