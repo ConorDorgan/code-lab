@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import type { Course, Lesson } from '@/lib/lessons/types';
 
 interface Message {
@@ -132,16 +134,39 @@ Answer questions about this lesson. Keep responses short and practical. Use code
         )}
         {messages.map((m, i) => (
           <div key={i} className={`flex gap-2 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div
-              className="font-mono text-xs px-2 py-1.5 max-w-[85%] whitespace-pre-wrap break-words"
-              style={
-                m.role === 'user'
-                  ? { background: 'color-mix(in srgb, var(--accent) 18%, transparent)', color: 'var(--terminal-txt)', border: '1px solid color-mix(in srgb, var(--accent) 30%, transparent)' }
-                  : { color: 'var(--terminal-dim)', borderLeft: '2px solid rgba(255,255,255,0.12)', paddingLeft: '8px' }
-              }
-            >
-              {m.content}
-            </div>
+            {m.role === 'user' ? (
+              <div
+                className="font-mono text-xs px-2 py-1.5 max-w-[85%] whitespace-pre-wrap break-words"
+                style={{ background: 'color-mix(in srgb, var(--accent) 18%, transparent)', color: 'var(--terminal-txt)', border: '1px solid color-mix(in srgb, var(--accent) 30%, transparent)' }}
+              >
+                {m.content}
+              </div>
+            ) : (
+              <div
+                className="max-w-[92%] text-xs pl-2 border-l-2"
+                style={{ borderLeftColor: 'rgba(255,255,255,0.12)', color: 'var(--terminal-dim)' }}
+              >
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    p: ({ children }) => <p className="font-mono mb-2 last:mb-0 leading-relaxed">{children}</p>,
+                    code: ({ children, className }) => {
+                      const isBlock = className?.includes('language-');
+                      return isBlock
+                        ? <code className="block font-mono text-[11px] px-3 py-2 my-2 overflow-x-auto" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--terminal-txt)' }}>{children}</code>
+                        : <code className="font-mono text-[11px] px-1" style={{ background: 'rgba(255,255,255,0.08)', color: 'var(--terminal-txt)' }}>{children}</code>;
+                    },
+                    pre: ({ children }) => <pre className="my-2">{children}</pre>,
+                    strong: ({ children }) => <strong className="font-semibold" style={{ color: 'var(--terminal-txt)' }}>{children}</strong>,
+                    ul: ({ children }) => <ul className="font-mono list-disc list-inside mb-2 space-y-0.5">{children}</ul>,
+                    ol: ({ children }) => <ol className="font-mono list-decimal list-inside mb-2 space-y-0.5">{children}</ol>,
+                    li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+                  }}
+                >
+                  {m.content}
+                </ReactMarkdown>
+              </div>
+            )}
           </div>
         ))}
         {loading && (
