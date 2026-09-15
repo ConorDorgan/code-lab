@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import type { Course, Lesson } from '@/lib/lessons/types';
 import LessonView from '@/components/LessonView';
 import CodeEditor from '@/components/CodeEditor';
@@ -35,8 +35,39 @@ export default function LessonPageClient({ course, lesson }: Props) {
   const [proseWidth, setProseWidth] = useState(DEFAULT_PROSE);
   const [proseCollapsed, setProseCollapsed] = useState(false);
   const dragging = useRef(false);
-  const dragStart = useRef({ x: 0, width: DEFAULT_PROSE });
+  const dragStartX = useRef(0);
+  const dragStartWidth = useRef(DEFAULT_PROSE);
   const { run, status, result } = useRunner(course.language);
+
+  // Attach drag listeners to document so fast mouse movement off the 5px handle still works
+  useEffect(() => {
+    function onMove(e: PointerEvent) {
+      if (!dragging.current) return;
+      const delta = e.clientX - dragStartX.current;
+      setProseWidth(Math.min(MAX_PROSE, Math.max(MIN_PROSE, dragStartWidth.current + delta)));
+    }
+    function onUp() {
+      if (!dragging.current) return;
+      dragging.current = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    }
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
+    return () => {
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp);
+    };
+  }, []);
+
+  const onDragStart = useCallback((e: React.PointerEvent) => {
+    e.preventDefault();
+    dragging.current = true;
+    dragStartX.current = e.clientX;
+    dragStartWidth.current = proseWidth;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  }, [proseWidth]);
 
   async function handleRun() {
     setOutputTab('output');
@@ -57,23 +88,6 @@ export default function LessonPageClient({ course, lesson }: Props) {
     else setActiveEditor('code');
   }
 
-  const onDragStart = useCallback((e: React.PointerEvent) => {
-    e.preventDefault();
-    dragging.current = true;
-    dragStart.current = { x: e.clientX, width: proseWidth };
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
-  }, [proseWidth]);
-
-  const onDragMove = useCallback((e: React.PointerEvent) => {
-    if (!dragging.current) return;
-    const delta = e.clientX - dragStart.current.x;
-    setProseWidth(Math.min(MAX_PROSE, Math.max(MIN_PROSE, dragStart.current.width + delta)));
-  }, []);
-
-  const onDragEnd = useCallback(() => {
-    dragging.current = false;
-  }, []);
-
   const isRunning = status === 'running' || status === 'loading';
   const editorValue = activeEditor === 'solution' ? solution : code;
   const editorOnChange = activeEditor === 'solution' ? () => {} : setCode;
@@ -86,12 +100,9 @@ export default function LessonPageClient({ course, lesson }: Props) {
         style={{
           background: 'var(--surface)',
           borderRight: '1px solid var(--border)',
-          width: proseCollapsed ? '0px' : undefined,
+          // Mobile: fill available space. Desktop: use draggable width (or 0 when collapsed)
+          width: proseCollapsed ? '0px' : `${proseWidth}px`,
           minWidth: proseCollapsed ? '0px' : undefined,
-          // On desktop, use the draggable width unless collapsed
-          ...(typeof window !== 'undefined' && window.innerWidth >= 768 && !proseCollapsed
-            ? { width: `${proseWidth}px` }
-            : {}),
         }}
         aria-label="Lesson content"
       >
@@ -147,11 +158,9 @@ export default function LessonPageClient({ course, lesson }: Props) {
 
       {/* ── Resize handle (desktop only) ─────────── */}
       <div
-        className="hidden md:flex shrink-0 w-[5px] cursor-col-resize items-center justify-center group select-none"
+        className="hidden md:flex shrink-0 w-[8px] cursor-col-resize items-center justify-center group select-none relative"
         style={{ background: 'var(--border)' }}
         onPointerDown={onDragStart}
-        onPointerMove={onDragMove}
-        onPointerUp={onDragEnd}
         title="Drag to resize"
       >
         {/* Collapse/expand toggle on the handle */}
