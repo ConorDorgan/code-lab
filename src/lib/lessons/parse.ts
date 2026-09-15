@@ -21,7 +21,9 @@ function parseLessonBody(raw: string): { prose: string; blocks: CodeBlock[] } {
 }
 
 export function parseCourse(markdown: string): Course {
-  const { data, content } = matter(markdown);
+  // Normalize CRLF → LF so the regex works on Windows-touched files
+  const normalised = markdown.replace(/\r\n/g, '\n');
+  const { data, content } = matter(normalised);
 
   if (!data.course) throw new Error('Missing frontmatter field: course');
   if (!data.language) throw new Error('Missing frontmatter field: language');
@@ -29,8 +31,8 @@ export function parseCourse(markdown: string): Course {
     throw new Error(`Invalid language "${data.language}". Must be "python" or "sql".`);
   }
 
-  // Split on top-level "# Lesson: <title>" headings
-  const lessonSections = content.split(/^# Lesson:\s*/m).filter(Boolean);
+  // Split on top-level "# Lesson: <title>" headings; drop whitespace-only segments
+  const lessonSections = content.split(/^# Lesson:\s*/m).filter((s) => s.trim());
   if (lessonSections.length === 0) {
     throw new Error('No lessons found. Add at least one "# Lesson: <title>" heading.');
   }

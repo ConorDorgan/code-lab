@@ -12,7 +12,7 @@ export function getBuiltInCourses(): Course[] {
   const files = ['python-basics.md', 'sql-basics.md'];
   cached = files.map((f) => {
     const raw = fs.readFileSync(path.join(CONTENT_DIR, f), 'utf-8');
-    return parseCourse(raw);
+    return parseCourse(raw); // parseCourse normalises CRLF internally
   });
   return cached;
 }
