@@ -34,12 +34,12 @@ export default function LessonPageClient({ course, lesson }: Props) {
   const [mobilePane, setMobilePane] = useState<'lesson' | 'code'>('lesson');
   const [proseWidth, setProseWidth] = useState(DEFAULT_PROSE);
   const [proseCollapsed, setProseCollapsed] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const dragging = useRef(false);
   const dragStartX = useRef(0);
   const dragStartWidth = useRef(DEFAULT_PROSE);
   const { run, status, result } = useRunner(course.language);
 
-  // Attach drag listeners to document so fast mouse movement off the 5px handle still works
   useEffect(() => {
     function onMove(e: PointerEvent) {
       if (!dragging.current) return;
@@ -49,6 +49,7 @@ export default function LessonPageClient({ course, lesson }: Props) {
     function onUp() {
       if (!dragging.current) return;
       dragging.current = false;
+      setIsDragging(false);
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
     }
@@ -65,6 +66,7 @@ export default function LessonPageClient({ course, lesson }: Props) {
     dragging.current = true;
     dragStartX.current = e.clientX;
     dragStartWidth.current = proseWidth;
+    setIsDragging(true);
     document.body.style.cursor = 'col-resize';
     document.body.style.userSelect = 'none';
   }, [proseWidth]);
@@ -261,12 +263,16 @@ export default function LessonPageClient({ course, lesson }: Props) {
         </div>
 
         {/* Editor */}
-        <div className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0 relative">
           <CodeEditor
             value={editorValue}
             onChange={editorOnChange}
             language={course.language}
           />
+          {/* Drag overlay — blocks Monaco from swallowing pointer events during resize */}
+          {isDragging && (
+            <div className="absolute inset-0 z-50" style={{ cursor: 'col-resize' }} />
+          )}
         </div>
 
         {/* Output + AI panel */}
