@@ -28,10 +28,12 @@ export default function LessonPageClient({ course, lesson }: Props) {
   const [showSolution, setShowSolution] = useState(false);
   const [activeEditor, setActiveEditor] = useState<'code' | 'solution'>('code');
   const [outputTab, setOutputTab] = useState<'output' | 'ai'>('output');
+  const [mobilePane, setMobilePane] = useState<'lesson' | 'code'>('lesson');
   const { run, status, result } = useRunner(course.language);
 
   async function handleRun() {
     setOutputTab('output');
+    setMobilePane('code');
     await run(activeEditor === 'solution' ? solution : code, setup);
   }
 
@@ -53,10 +55,10 @@ export default function LessonPageClient({ course, lesson }: Props) {
   const editorOnChange = activeEditor === 'solution' ? () => {} : setCode;
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden flex-col md:flex-row">
       {/* ── Lesson prose panel ───────────────────── */}
       <section
-        className="w-[380px] shrink-0 flex flex-col border-r overflow-hidden hidden md:flex"
+        className={`shrink-0 flex flex-col border-r overflow-hidden md:flex md:w-[380px] ${mobilePane === 'lesson' ? 'flex flex-1 w-full' : 'hidden'}`}
         style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
         aria-label="Lesson content"
       >
@@ -88,8 +90,8 @@ export default function LessonPageClient({ course, lesson }: Props) {
           </h1>
         </div>
 
-        {/* Prose content */}
-        <div className="flex-1 overflow-y-auto px-6 py-5">
+        {/* Prose content — extra bottom padding on mobile for pill nav */}
+        <div className="flex-1 overflow-y-auto px-6 py-5 pb-20 md:pb-5">
           <LessonView lesson={lesson} />
 
           {/* Expected output */}
@@ -135,7 +137,7 @@ export default function LessonPageClient({ course, lesson }: Props) {
 
       {/* ── Editor + Output zone (always dark) ───── */}
       <div
-        className="flex-1 flex flex-col overflow-hidden"
+        className={`flex flex-col overflow-hidden md:flex-1 ${mobilePane === 'code' ? 'flex-1 w-full' : 'hidden md:flex'}`}
         style={{ background: 'var(--terminal-bg)' }}
       >
         {/* Editor toolbar */}
@@ -265,6 +267,36 @@ export default function LessonPageClient({ course, lesson }: Props) {
             )}
           </div>
         </div>
+      </div>
+      {/* ── Mobile pill nav ───────────────────────── */}
+      <div
+        className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1 px-1.5 py-1.5 rounded-full shadow-lg"
+        style={{ background: 'var(--terminal-bg)', border: '1px solid rgba(255,255,255,0.12)' }}
+        role="tablist"
+        aria-label="Toggle lesson pane"
+      >
+        <button
+          role="tab"
+          aria-selected={mobilePane === 'lesson'}
+          onClick={() => setMobilePane('lesson')}
+          className="font-mono text-xs px-5 py-2 rounded-full transition-colors duration-150"
+          style={mobilePane === 'lesson'
+            ? { background: 'var(--accent)', color: 'var(--terminal-bg)' }
+            : { color: 'var(--terminal-dim)' }}
+        >
+          lesson
+        </button>
+        <button
+          role="tab"
+          aria-selected={mobilePane === 'code'}
+          onClick={() => setMobilePane('code')}
+          className="font-mono text-xs px-5 py-2 rounded-full transition-colors duration-150"
+          style={mobilePane === 'code'
+            ? { background: 'var(--accent)', color: 'var(--terminal-bg)' }
+            : { color: 'var(--terminal-dim)' }}
+        >
+          code
+        </button>
       </div>
     </div>
   );
