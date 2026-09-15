@@ -94,10 +94,10 @@ Answer questions about this lesson. Keep responses short and practical. Use code
     return (
       <div className="flex flex-col items-start justify-center h-full px-4 py-3 gap-3">
         <p className="font-mono text-xs" style={{ color: 'var(--terminal-dim)' }}>
-          Enter your Anthropic API key to ask questions about this lesson.
+          Enter a free Google Gemini API key to ask questions about this lesson.
         </p>
         <p className="font-mono text-[10px]" style={{ color: 'var(--terminal-dim)', opacity: 0.6 }}>
-          Key is stored in localStorage — never sent anywhere except Anthropic via this app.
+          Get one free at aistudio.google.com — stored in localStorage, only sent to Google.
         </p>
         <div className="flex gap-2 w-full max-w-sm">
           <input
@@ -105,7 +105,7 @@ Answer questions about this lesson. Keep responses short and practical. Use code
             value={keyInput}
             onChange={(e) => setKeyInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && saveKey()}
-            placeholder="sk-ant-..."
+            placeholder="AIza..."
             className="flex-1 font-mono text-xs px-2 py-1 border bg-transparent outline-none focus:border-[color:var(--accent)]"
             style={{ color: 'var(--terminal-txt)', borderColor: 'rgba(255,255,255,0.15)' }}
           />
