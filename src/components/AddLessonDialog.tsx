@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { AUTHORING_SPEC } from '@/lib/lessons/authoringSpec';
 import { validateCourseMarkdown } from '@/lib/lessons/parse';
 import { saveCustomCourse } from '@/lib/lessons/store';
@@ -18,6 +18,7 @@ export default function AddLessonDialog({ onAdded, onClose }: Props) {
   const [markdown, setMarkdown] = useState('');
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   function handleCopy() {
@@ -33,11 +34,12 @@ export default function AddLessonDialog({ onAdded, onClose }: Props) {
     reader.readAsText(file);
   }
 
-  function handleDrop(e: React.DragEvent) {
+  const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
+    setIsDragOver(false);
     const file = e.dataTransfer.files[0];
     if (file) handleFile(file);
-  }
+  }, []);
 
   async function handleImport() {
     setError('');
@@ -51,74 +53,138 @@ export default function AddLessonDialog({ onAdded, onClose }: Props) {
     setMarkdown('');
   }
 
+  const tabStyle = (t: Tab) => ({
+    color: tab === t ? 'var(--text)' : 'var(--text-muted)',
+    borderBottom: tab === t ? '2px solid var(--accent)' : '2px solid transparent',
+    background: 'transparent',
+  });
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.6)' }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="bg-zinc-900 border border-zinc-700 rounded-xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl">
+      <div
+        className="w-full max-w-2xl max-h-[88vh] flex flex-col border overflow-hidden"
+        style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Add a course"
+      >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-700">
-          <h2 className="text-white font-semibold">Add a course</h2>
-          <button onClick={onClose} className="text-zinc-400 hover:text-white text-xl leading-none">&times;</button>
+        <div
+          className="flex items-center justify-between px-5 h-11 border-b shrink-0"
+          style={{ borderColor: 'var(--border)' }}
+        >
+          <span className="font-mono text-xs uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+            add course
+          </span>
+          <button
+            onClick={onClose}
+            className="font-mono text-lg leading-none w-8 h-8 flex items-center justify-center transition-colors duration-100"
+            style={{ color: 'var(--text-muted)' }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+            aria-label="Close dialog"
+          >
+            ×
+          </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-zinc-700">
+        <div
+          className="flex border-b shrink-0"
+          style={{ borderColor: 'var(--border)' }}
+          role="tablist"
+        >
           {(['format', 'import'] as Tab[]).map((t) => (
             <button
               key={t}
+              role="tab"
+              aria-selected={tab === t}
               onClick={() => setTab(t)}
-              className={`px-5 py-3 text-sm font-medium transition-colors ${
-                tab === t ? 'text-white border-b-2 border-sky-500' : 'text-zinc-400 hover:text-zinc-200'
-              }`}
+              className="px-5 py-2.5 font-mono text-xs uppercase tracking-wider transition-colors duration-100"
+              style={tabStyle(t)}
             >
-              {t === 'format' ? '1. Get the format' : '2. Import course'}
+              {t === 'format' ? '1. get format' : '2. import'}
             </button>
           ))}
         </div>
 
-        {/* Tab content */}
+        {/* Content */}
         <div className="flex-1 overflow-auto p-5">
           {tab === 'format' && (
-            <div>
-              <p className="text-zinc-300 text-sm mb-3">
-                Copy these instructions into a <strong>Claude project</strong> and ask Claude to write you a course. Then paste the result in the Import tab.
+            <div className="space-y-4">
+              <p className="font-sans text-sm" style={{ color: 'var(--text-muted)' }}>
+                Copy these instructions into a{' '}
+                <strong style={{ color: 'var(--text)' }}>Claude project</strong> and ask Claude to write you a course.
+                Then paste the result in the Import tab.
               </p>
+
               <div className="relative">
-                <pre className="bg-zinc-800 rounded-lg p-4 text-xs text-zinc-300 overflow-auto max-h-[50vh] whitespace-pre-wrap">
+                <pre
+                  className="font-mono text-xs p-4 overflow-auto max-h-[52vh] border"
+                  style={{
+                    background: 'var(--terminal-bg)',
+                    color: 'var(--terminal-txt)',
+                    borderColor: 'var(--border)',
+                    lineHeight: 1.6,
+                  }}
+                >
                   {AUTHORING_SPEC}
                 </pre>
                 <button
                   onClick={handleCopy}
-                  className="absolute top-3 right-3 px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs rounded transition-colors"
+                  className="absolute top-3 right-3 font-mono text-[11px] px-3 py-1.5 border transition-colors duration-150"
+                  style={{
+                    background: copied ? 'var(--accent)' : 'var(--terminal-bg)',
+                    color: copied ? 'var(--terminal-bg)' : 'var(--accent)',
+                    borderColor: 'var(--accent)',
+                  }}
                 >
-                  {copied ? 'Copied!' : 'Copy'}
+                  {copied ? 'copied' : 'copy'}
                 </button>
               </div>
+
               <button
                 onClick={() => setTab('import')}
-                className="mt-4 px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white text-sm rounded-lg transition-colors"
+                className="font-mono text-xs px-4 py-2 border transition-colors duration-150"
+                style={{
+                  color: 'var(--accent)',
+                  borderColor: 'var(--accent)',
+                  background: 'transparent',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'color-mix(in srgb, var(--accent) 10%, transparent)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
               >
-                Next: Import course &rarr;
+                next: import course →
               </button>
             </div>
           )}
 
           {tab === 'import' && (
             <div className="space-y-4">
-              <p className="text-zinc-300 text-sm">
-                Drop a <code className="text-sky-400">.md</code> file or paste the Markdown that Claude generated.
+              <p className="font-sans text-sm" style={{ color: 'var(--text-muted)' }}>
+                Drop a <code className="font-mono text-xs" style={{ color: 'var(--accent)' }}>.md</code> file or paste
+                the markdown Claude generated.
               </p>
 
               {/* Drop zone */}
-              <div
+              <button
                 onDrop={handleDrop}
-                onDragOver={(e) => e.preventDefault()}
+                onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+                onDragLeave={() => setIsDragOver(false)}
                 onClick={() => fileRef.current?.click()}
-                className="border-2 border-dashed border-zinc-600 hover:border-sky-500 rounded-lg p-6 text-center cursor-pointer transition-colors"
+                className="w-full py-6 border-2 border-dashed font-mono text-xs transition-colors duration-150 text-center"
+                style={{
+                  borderColor: isDragOver ? 'var(--accent)' : 'var(--border)',
+                  color: isDragOver ? 'var(--accent)' : 'var(--text-muted)',
+                  background: isDragOver ? 'color-mix(in srgb, var(--accent) 5%, transparent)' : 'transparent',
+                }}
+                aria-label="Drop .md file or click to browse"
               >
-                <p className="text-zinc-400 text-sm">Drop .md file here or click to browse</p>
+                drop .md file or click to browse
                 <input
                   ref={fileRef}
                   type="file"
@@ -126,34 +192,59 @@ export default function AddLessonDialog({ onAdded, onClose }: Props) {
                   className="hidden"
                   onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
                 />
-              </div>
+              </button>
 
-              <p className="text-zinc-500 text-xs text-center">or paste directly</p>
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
+                <span className="font-mono text-[10px] uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>or paste</span>
+                <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
+              </div>
 
               <textarea
                 value={markdown}
                 onChange={(e) => setMarkdown(e.target.value)}
-                className="w-full h-48 bg-zinc-800 border border-zinc-600 rounded-lg p-3 text-sm font-mono text-zinc-200 focus:outline-none focus:border-sky-500 resize-none"
-                placeholder="Paste course markdown here..."
+                className="w-full h-44 font-mono text-xs p-3 border resize-none focus:outline-none transition-colors duration-150"
+                style={{
+                  background: 'var(--surface-2)',
+                  color: 'var(--text)',
+                  borderColor: 'var(--border)',
+                  caretColor: 'var(--accent)',
+                }}
+                onFocus={(e) => (e.currentTarget.style.borderColor = 'var(--accent)')}
+                onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
+                placeholder="paste course markdown here…"
+                aria-label="Course markdown content"
               />
 
               {error && (
-                <p className="text-red-400 text-sm bg-red-950/40 border border-red-800 rounded px-3 py-2">{error}</p>
+                <div
+                  className="font-mono text-xs px-4 py-3 border"
+                  style={{ color: '#f87171', background: 'rgba(248,113,113,0.08)', borderColor: 'rgba(248,113,113,0.3)' }}
+                  role="alert"
+                >
+                  {error}
+                </div>
               )}
 
-              <div className="flex gap-3">
+              <div className="flex items-center gap-3">
                 <button
                   onClick={handleImport}
                   disabled={!markdown.trim()}
-                  className="px-4 py-2 bg-sky-600 hover:bg-sky-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm rounded-lg transition-colors"
+                  className="font-mono text-xs px-5 py-2 font-semibold transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{ background: 'var(--accent)', color: 'var(--accent-fg)' }}
+                  onMouseEnter={(e) => { if (markdown.trim()) e.currentTarget.style.opacity = '0.85'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
                 >
-                  Import course
+                  import course
                 </button>
                 <button
                   onClick={() => { setMarkdown(''); setError(''); }}
-                  className="px-4 py-2 text-zinc-400 hover:text-white text-sm transition-colors"
+                  className="font-mono text-xs px-3 py-2 transition-colors duration-150"
+                  style={{ color: 'var(--text-muted)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
                 >
-                  Clear
+                  clear
                 </button>
               </div>
             </div>

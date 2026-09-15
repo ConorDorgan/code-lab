@@ -6,15 +6,19 @@ import { useEffect, useState } from 'react';
 import type { Course } from '@/lib/lessons/types';
 import { getCustomCourses, deleteCustomCourse } from '@/lib/lessons/store';
 import AddLessonDialog from './AddLessonDialog';
+import ThemeToggle from './ThemeToggle';
 
 interface Props {
   builtInCourses: Course[];
 }
 
+const LANG_LABEL: Record<string, string> = { python: 'py', sql: 'sql' };
+
 export default function Sidebar({ builtInCourses }: Props) {
   const pathname = usePathname();
   const [customCourses, setCustomCourses] = useState<Course[]>([]);
   const [showDialog, setShowDialog] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     getCustomCourses().then(setCustomCourses);
@@ -23,86 +27,154 @@ export default function Sidebar({ builtInCourses }: Props) {
   const allCourses = [...builtInCourses, ...customCourses];
 
   function handleAdded(course: Course) {
-    setCustomCourses((prev) => {
-      const next = prev.filter((c) => c.id !== course.id);
-      return [...next, course];
-    });
+    setCustomCourses((prev) => [...prev.filter((c) => c.id !== course.id), course]);
     setShowDialog(false);
+    setMobileOpen(false);
   }
 
-  async function handleDelete(courseId: string) {
+  async function handleDelete(courseId: string, e: React.MouseEvent) {
+    e.preventDefault();
     await deleteCustomCourse(courseId);
     setCustomCourses((prev) => prev.filter((c) => c.id !== courseId));
   }
 
-  return (
-    <>
-      <aside className="w-64 shrink-0 bg-zinc-900 border-r border-zinc-800 flex flex-col h-screen sticky top-0 overflow-hidden">
-        {/* Logo */}
-        <div className="px-5 py-4 border-b border-zinc-800">
-          <span className="text-white font-bold tracking-tight">Code Lab</span>
-        </div>
+  const sidebarContent = (
+    <aside
+      className="flex flex-col h-full w-[220px] shrink-0 border-r"
+      style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}
+    >
+      {/* Header */}
+      <div
+        className="flex items-center justify-between px-4 h-11 border-b shrink-0"
+        style={{ borderColor: 'var(--border)' }}
+      >
+        <span
+          className="font-mono text-xs font-semibold tracking-widest uppercase"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          code-lab
+        </span>
+        <ThemeToggle />
+      </div>
 
-        {/* Course list */}
-        <nav className="flex-1 overflow-y-auto py-3">
-          {allCourses.map((course) => (
-            <div key={course.id} className="mb-4">
-              {/* Course header */}
-              <div className="flex items-center justify-between px-4 mb-1">
-                <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-                  {course.name}
+      {/* Course list */}
+      <nav className="flex-1 overflow-y-auto py-2" aria-label="Lessons">
+        {allCourses.map((course) => (
+          <div key={course.id} className="mb-1">
+            {/* Course label */}
+            <div
+              className="flex items-center justify-between px-4 pt-3 pb-1"
+            >
+              <span
+                className="font-mono text-[10px] uppercase tracking-widest font-semibold flex items-center gap-1.5"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                <span
+                  className="inline-block px-1 text-[9px] rounded-sm font-mono"
+                  style={{ background: 'var(--border)', color: 'var(--text-muted)' }}
+                >
+                  {LANG_LABEL[course.language] ?? course.language}
                 </span>
-                {course.isCustom && (
-                  <button
-                    onClick={() => handleDelete(course.id)}
-                    title="Remove course"
-                    className="text-zinc-600 hover:text-red-400 text-xs transition-colors"
-                  >
-                    &times;
-                  </button>
-                )}
-              </div>
-
-              {/* Lessons */}
-              {course.lessons.map((lesson, idx) => {
-                const href = `/learn/${course.id}/${lesson.id}`;
-                const active = pathname === href;
-                return (
-                  <Link
-                    key={lesson.id}
-                    href={href}
-                    className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors ${
-                      active
-                        ? 'bg-sky-900/40 text-sky-300 border-r-2 border-sky-400'
-                        : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800'
-                    }`}
-                  >
-                    <span className="text-zinc-600 text-xs w-4 text-right shrink-0">{idx + 1}</span>
-                    {lesson.title}
-                  </Link>
-                );
-              })}
-
-              {/* Custom badge */}
+                {course.name}
+              </span>
               {course.isCustom && (
-                <div className="px-4 mt-1">
-                  <span className="text-xs text-sky-600 italic">Custom</span>
-                </div>
+                <button
+                  onClick={(e) => handleDelete(course.id, e)}
+                  title="Remove course"
+                  aria-label={`Remove ${course.name}`}
+                  className="font-mono text-xs transition-colors duration-150 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                  style={{ color: 'var(--text-muted)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#e05252')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+                >
+                  ×
+                </button>
               )}
             </div>
-          ))}
-        </nav>
 
-        {/* Add new */}
-        <div className="px-4 py-3 border-t border-zinc-800">
-          <button
-            onClick={() => setShowDialog(true)}
-            className="w-full px-3 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-sky-600 text-zinc-300 hover:text-white text-sm rounded-lg transition-colors text-left"
-          >
-            + Add course
-          </button>
+            {/* Lessons */}
+            {course.lessons.map((lesson, idx) => {
+              const href = `/learn/${course.id}/${lesson.id}`;
+              const active = pathname === href;
+              return (
+                <Link
+                  key={lesson.id}
+                  href={href}
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-2 px-4 py-1.5 transition-colors duration-100 group relative min-h-[36px]"
+                  style={active ? {
+                    background: 'color-mix(in srgb, var(--accent) 12%, transparent)',
+                    color: 'var(--accent)',
+                    borderLeft: '2px solid var(--accent)',
+                    paddingLeft: 'calc(1rem - 2px)',
+                  } : { color: 'var(--text-muted)' }}
+                  onMouseEnter={(e) => { if (!active) { e.currentTarget.style.color = 'var(--text)'; e.currentTarget.style.background = 'color-mix(in srgb, var(--border) 60%, transparent)'; } }}
+                  onMouseLeave={(e) => { if (!active) { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = ''; } }}
+                  aria-current={active ? 'page' : undefined}
+                >
+                  <span
+                    className="font-mono text-[10px] w-4 text-right shrink-0 tabular-nums"
+                    style={{ color: active ? 'var(--accent)' : 'var(--border)' }}
+                  >
+                    {String(idx + 1).padStart(2, '0')}
+                  </span>
+                  <span className="font-mono text-xs truncate leading-snug">{lesson.title}</span>
+                </Link>
+              );
+            })}
+          </div>
+        ))}
+      </nav>
+
+      {/* Add course */}
+      <div className="shrink-0 p-3 border-t" style={{ borderColor: 'var(--border)' }}>
+        <button
+          onClick={() => setShowDialog(true)}
+          className="w-full flex items-center gap-2 px-3 py-2 font-mono text-xs border transition-colors duration-150 text-left"
+          style={{ color: 'var(--text-muted)', borderColor: 'var(--border)', background: 'transparent' }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = 'var(--accent)';
+            e.currentTarget.style.borderColor = 'var(--accent)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = 'var(--text-muted)';
+            e.currentTarget.style.borderColor = 'var(--border)';
+          }}
+        >
+          <span aria-hidden>+</span> add course
+        </button>
+      </div>
+    </aside>
+  );
+
+  return (
+    <>
+      {/* Mobile hamburger */}
+      <button
+        className="md:hidden fixed top-3 left-3 z-50 w-8 h-8 flex items-center justify-center border font-mono text-sm transition-colors duration-150"
+        style={{ background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text-muted)' }}
+        onClick={() => setMobileOpen((v) => !v)}
+        aria-label="Toggle navigation"
+        aria-expanded={mobileOpen}
+      >
+        {mobileOpen ? '×' : '☰'}
+      </button>
+
+      {/* Desktop sidebar */}
+      <div className="hidden md:flex h-screen sticky top-0 shrink-0">
+        {sidebarContent}
+      </div>
+
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div className="md:hidden fixed inset-0 z-40 flex">
+          <div className="flex h-full">{sidebarContent}</div>
+          <div
+            className="flex-1 bg-black/50"
+            onClick={() => setMobileOpen(false)}
+          />
         </div>
-      </aside>
+      )}
 
       {showDialog && (
         <AddLessonDialog onAdded={handleAdded} onClose={() => setShowDialog(false)} />

@@ -16,10 +16,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const builtInCourses = getBuiltInCourses();
 
   return (
-    <html lang="en" className="dark">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-zinc-950 text-zinc-100 flex`}>
+    <html lang="en">
+      <head>
+        {/* Prevent FOUC — read theme preference before first paint */}
+        <script dangerouslySetInnerHTML={{ __html: `(function(){var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark')})()` }} />
+      </head>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased flex h-screen overflow-hidden bg-[color:var(--bg)] text-[color:var(--text)]`}>
         <Sidebar builtInCourses={builtInCourses} />
-        <main className="flex-1 min-h-screen overflow-hidden">
+        <main className="flex-1 overflow-hidden">
           {children}
         </main>
       </body>

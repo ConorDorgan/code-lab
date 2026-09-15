@@ -12,102 +12,210 @@ interface Props {
   lesson: Lesson;
 }
 
+const LANG_LABEL: Record<string, string> = { python: 'python', sql: 'sql' };
+
 export default function LessonPageClient({ course, lesson }: Props) {
-  const starter = lesson.blocks.find((b) => b.role === 'starter')?.code ?? '';
+  const starter  = lesson.blocks.find((b) => b.role === 'starter')?.code ?? '';
   const solution = lesson.blocks.find((b) => b.role === 'solution')?.code ?? '';
   const expected = lesson.blocks.find((b) => b.role === 'expected')?.code ?? '';
-  const setup = lesson.blocks.find((b) => b.role === 'setup')?.code;
+  const setup    = lesson.blocks.find((b) => b.role === 'setup')?.code;
 
   const [code, setCode] = useState(starter);
   const [showSolution, setShowSolution] = useState(false);
+  const [activeEditor, setActiveEditor] = useState<'code' | 'solution'>('code');
   const { run, status, result } = useRunner(course.language);
 
   async function handleRun() {
-    await run(code, setup);
+    await run(activeEditor === 'solution' ? solution : code, setup);
   }
 
   function handleReset() {
     setCode(starter);
     setShowSolution(false);
+    setActiveEditor('code');
   }
 
-  return (
-    <div className="flex flex-col h-screen">
-      {/* Top bar */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-800 bg-zinc-950 shrink-0">
-        <div>
-          <p className="text-xs text-zinc-500 mb-0.5">{course.name}</p>
-          <h1 className="text-lg font-semibold text-white leading-tight">{lesson.title}</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          {solution && (
-            <button
-              onClick={() => setShowSolution((v) => !v)}
-              className="px-3 py-1.5 text-sm text-zinc-400 hover:text-zinc-100 border border-zinc-700 hover:border-zinc-500 rounded transition-colors"
-            >
-              {showSolution ? 'Hide solution' : 'Show solution'}
-            </button>
-          )}
-          <button
-            onClick={handleReset}
-            className="px-3 py-1.5 text-sm text-zinc-400 hover:text-zinc-100 border border-zinc-700 hover:border-zinc-500 rounded transition-colors"
-          >
-            Reset
-          </button>
-          <button
-            onClick={handleRun}
-            disabled={status === 'running' || status === 'loading'}
-            className="px-4 py-1.5 text-sm font-medium bg-sky-600 hover:bg-sky-500 disabled:opacity-50 text-white rounded transition-colors"
-          >
-            {status === 'running' ? 'Running...' : status === 'loading' ? 'Loading...' : 'Run'}
-          </button>
-        </div>
-      </div>
+  function toggleSolution() {
+    const next = !showSolution;
+    setShowSolution(next);
+    if (next) setActiveEditor('solution');
+    else setActiveEditor('code');
+  }
 
-      {/* Main content: lesson prose | editor + output */}
-      <div className="flex flex-1 min-h-0">
-        {/* Left: lesson content */}
-        <div className="w-96 shrink-0 border-r border-zinc-800 overflow-y-auto p-5 bg-zinc-950">
+  const isRunning = status === 'running' || status === 'loading';
+  const editorValue = activeEditor === 'solution' ? solution : code;
+  const editorOnChange = activeEditor === 'solution' ? () => {} : setCode;
+
+  return (
+    <div className="flex h-screen overflow-hidden">
+      {/* ── Lesson prose panel ───────────────────── */}
+      <section
+        className="w-[380px] shrink-0 flex flex-col border-r overflow-hidden hidden md:flex"
+        style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+        aria-label="Lesson content"
+      >
+        {/* Lesson header */}
+        <div
+          className="px-6 pt-5 pb-4 border-b shrink-0"
+          style={{ borderColor: 'var(--border)' }}
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <span
+              className="font-mono text-[10px] uppercase tracking-widest"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              {course.name}
+            </span>
+            <span style={{ color: 'var(--border)' }}>/</span>
+            <span
+              className="font-mono text-[10px] uppercase tracking-widest"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              {LANG_LABEL[course.language]}
+            </span>
+          </div>
+          <h1
+            className="font-mono text-base font-semibold leading-snug"
+            style={{ color: 'var(--text)' }}
+          >
+            {lesson.title}
+          </h1>
+        </div>
+
+        {/* Prose content */}
+        <div className="flex-1 overflow-y-auto px-6 py-5">
           <LessonView lesson={lesson} />
 
+          {/* Expected output */}
           {expected && (
             <div className="mt-6">
-              <p className="text-xs text-zinc-500 font-mono mb-1">Expected output</p>
-              <pre className="bg-zinc-800 rounded p-3 text-xs text-zinc-300 font-mono">{expected}</pre>
+              <p
+                className="font-mono text-[10px] uppercase tracking-widest mb-2"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                expected output
+              </p>
+              <pre
+                className="px-4 py-3 font-mono text-xs overflow-x-auto border-l-2 text-[color:var(--terminal-txt)]"
+                style={{
+                  background: 'var(--terminal-bg)',
+                  borderLeftColor: 'var(--accent)',
+                }}
+              >
+                {expected}
+              </pre>
             </div>
           )}
         </div>
+      </section>
 
-        {/* Right: editor + output */}
-        <div className="flex-1 flex flex-col min-h-0">
-          {/* Editor */}
-          <div className={`${showSolution ? 'h-1/3' : 'flex-1'} min-h-0 border-b border-zinc-800`}>
-            <CodeEditor value={code} onChange={setCode} language={course.language} />
+      {/* ── Editor + Output zone (always dark) ───── */}
+      <div
+        className="flex-1 flex flex-col overflow-hidden"
+        style={{ background: 'var(--terminal-bg)' }}
+      >
+        {/* Editor toolbar */}
+        <div
+          className="h-9 shrink-0 flex items-center gap-1 px-3 border-b"
+          style={{ borderColor: 'rgba(255,255,255,0.08)' }}
+        >
+          {/* Tab: code / solution */}
+          <div className="flex items-center gap-0 flex-1">
+            <button
+              onClick={() => setActiveEditor('code')}
+              className="font-mono text-[11px] px-3 h-9 border-b-2 transition-colors duration-150"
+              style={{
+                color: activeEditor === 'code' ? 'var(--terminal-txt)' : 'var(--terminal-dim)',
+                borderBottomColor: activeEditor === 'code' ? 'var(--accent)' : 'transparent',
+              }}
+            >
+              {LANG_LABEL[course.language]}
+            </button>
+            {showSolution && solution && (
+              <button
+                onClick={() => setActiveEditor('solution')}
+                className="font-mono text-[11px] px-3 h-9 border-b-2 transition-colors duration-150"
+                style={{
+                  color: activeEditor === 'solution' ? 'var(--terminal-txt)' : 'var(--terminal-dim)',
+                  borderBottomColor: activeEditor === 'solution' ? 'var(--accent)' : 'transparent',
+                }}
+              >
+                solution
+              </button>
+            )}
           </div>
 
-          {/* Solution (when shown) */}
-          {showSolution && solution && (
-            <div className="h-1/3 border-b border-zinc-800 bg-zinc-900/60 relative min-h-0">
-              <div className="absolute top-2 left-3 text-xs text-zinc-500 font-mono">solution</div>
-              <div className="pt-6 h-full">
-                <CodeEditor value={solution} onChange={() => {}} language={course.language} />
-              </div>
-            </div>
-          )}
+          {/* Controls */}
+          <div className="flex items-center gap-1">
+            {solution && (
+              <button
+                onClick={toggleSolution}
+                className="font-mono text-[11px] px-3 py-1 border transition-colors duration-150"
+                style={{
+                  color: showSolution ? 'var(--accent)' : 'var(--terminal-dim)',
+                  borderColor: showSolution ? 'var(--accent)' : 'rgba(255,255,255,0.12)',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--accent)'; }}
+                onMouseLeave={(e) => { if (!showSolution) e.currentTarget.style.color = 'var(--terminal-dim)'; }}
+              >
+                {showSolution ? 'hide solution' : 'solution'}
+              </button>
+            )}
+            <button
+              onClick={handleReset}
+              className="font-mono text-[11px] px-3 py-1 border transition-colors duration-150"
+              style={{ color: 'var(--terminal-dim)', borderColor: 'rgba(255,255,255,0.12)' }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--terminal-txt)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--terminal-dim)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; }}
+            >
+              reset
+            </button>
+            <button
+              onClick={handleRun}
+              disabled={isRunning}
+              className="font-mono text-[11px] px-4 py-1 font-semibold transition-colors duration-150 disabled:opacity-50"
+              style={{ background: 'var(--accent)', color: 'var(--terminal-bg)' }}
+              onMouseEnter={(e) => { if (!isRunning) e.currentTarget.style.opacity = '0.85'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+            >
+              {isRunning ? 'running…' : 'run'}
+            </button>
+          </div>
+        </div>
 
-          {/* Output */}
-          <div className="h-48 shrink-0 border-t border-zinc-800 bg-zinc-950">
-            <div className="flex items-center px-3 py-1 border-b border-zinc-800 bg-zinc-900">
-              <span className="text-xs text-zinc-500 font-mono">output</span>
-              {result && (
-                <span className={`ml-auto text-xs ${result.error ? 'text-red-400' : 'text-green-400'}`}>
-                  {result.error ? 'error' : 'ok'}
-                </span>
-              )}
-            </div>
-            <div className="h-[calc(100%-2rem)] overflow-auto">
-              <OutputPanel status={status} result={result} />
-            </div>
+        {/* Editor */}
+        <div className="flex-1 min-h-0">
+          <CodeEditor
+            value={editorValue}
+            onChange={editorOnChange}
+            language={course.language}
+          />
+        </div>
+
+        {/* Output panel */}
+        <div
+          className="shrink-0 border-t flex flex-col"
+          style={{ height: '180px', borderColor: 'rgba(255,255,255,0.08)' }}
+        >
+          {/* Output header */}
+          <div
+            className="h-7 shrink-0 flex items-center px-3 border-b gap-3"
+            style={{ borderColor: 'rgba(255,255,255,0.08)' }}
+          >
+            <span className="font-mono text-[10px] uppercase tracking-widest" style={{ color: 'var(--terminal-dim)' }}>
+              output
+            </span>
+            {result && (
+              <span
+                className="font-mono text-[10px]"
+                style={{ color: result.error ? '#f87171' : '#4ade80' }}
+              >
+                {result.error ? '● error' : '● ok'}
+              </span>
+            )}
+          </div>
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <OutputPanel status={status} result={result} />
           </div>
         </div>
       </div>

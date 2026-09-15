@@ -10,7 +10,7 @@ interface Props {
 
 export default function LessonView({ lesson }: Props) {
   return (
-    <div className="prose prose-invert max-w-none text-sm">
+    <div className="prose max-w-none">
       <ReactMarkdown remarkPlugins={[remarkGfm]}>{lesson.prose}</ReactMarkdown>
     </div>
   );
