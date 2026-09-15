@@ -90,8 +90,8 @@ export default function LessonPageClient({ course, lesson }: Props) {
           </h1>
         </div>
 
-        {/* Prose content — extra bottom padding on mobile for pill nav */}
-        <div className="flex-1 overflow-y-auto px-6 py-5 pb-20 md:pb-5">
+        {/* Prose content */}
+        <div className="flex-1 overflow-y-auto px-6 py-5">
           <LessonView lesson={lesson} />
 
           {/* Expected output */}
@@ -270,8 +270,12 @@ export default function LessonPageClient({ course, lesson }: Props) {
       </div>
       {/* ── Mobile pill nav ───────────────────────── */}
       <div
-        className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1 px-1.5 py-1.5 rounded-full shadow-lg"
-        style={{ background: 'var(--terminal-bg)', border: '1px solid rgba(255,255,255,0.12)' }}
+        className="md:hidden shrink-0 flex justify-center items-center py-2"
+        style={{ background: 'var(--terminal-bg)', borderTop: '1px solid rgba(255,255,255,0.08)' }}
+      >
+      <div
+        className="flex items-center gap-1 px-1.5 py-1.5 rounded-full"
+        style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}
         role="tablist"
         aria-label="Toggle lesson pane"
       >
@@ -297,6 +301,7 @@ export default function LessonPageClient({ course, lesson }: Props) {
         >
           code
         </button>
+      </div>
       </div>
     </div>
   );
