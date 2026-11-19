@@ -8,7 +8,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parent.parent
+# .env in vinted-tool/ wins; a .env at the repo root is also read (never overrides real env vars).
 load_dotenv(ROOT / ".env")
+load_dotenv(ROOT.parent / ".env")
 
 VINTED_BASE = "https://www.vinted.ie"
 

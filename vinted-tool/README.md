@@ -9,18 +9,24 @@ items it can't identify well enough say **"no reliable price"** instead of guess
 
 ## Setup
 
-Needs Python 3.11+.
+Needs Python 3.11+. From the `vinted-tool` folder:
 
 ```bash
-cd vinted-tool
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-python -m playwright install chromium
-cp .env.example .env    # then edit .env
+./setup.sh
 ```
 
-`.env` (git-ignored, never printed or logged):
+That creates `.venv`, installs `requirements.txt`, installs Playwright's Chromium, creates `.env`
+from `.env.example` if you don't have one, and runs the tests. By hand it's:
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && .venv/bin/python -m playwright install chromium
+```
+
+Then activate the venv for the commands below (`source .venv/bin/activate`), or prefix them with
+`.venv/bin/`.
+
+`.env` (git-ignored, never printed or logged). Put it in `vinted-tool/.env`; a `.env` at the
+repo root is also read:
 
 | Variable | Needed for | If missing |
 |---|---|---|
@@ -94,6 +100,8 @@ python -m pytest -q
 Tests run offline against saved pages in `tests/fixtures/` (a real vinted.ie search page and item
 page, a real Foot Locker IE results page and product page, a Cloudflare challenge page, and a
 hand-made SerpAPI response).
+
+A real example report from 2026-11-19 is in `examples/salomon-xt-6-sample.html` (and `.csv`).
 
 ## How it works
 

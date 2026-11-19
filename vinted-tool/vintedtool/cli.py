@@ -87,7 +87,7 @@ def cmd_search(args) -> int:
 
 # ------------------------------------------------------------------ login / favourites
 
-LOGIN_URL = f"{config.VINTED_BASE}/member/signup/select_type?ref_url=%2F"
+LOGIN_URL = f"{config.VINTED_BASE}/member/register/select_type?ref_url=%2F"
 
 
 def cmd_login(args) -> int:
@@ -171,7 +171,7 @@ def cmd_favourites(args) -> int:
             except Blocked as e:
                 print(f"✗ Vinted blocked the favourites page ({e.reason}). Logged to BLOCKERS.md.")
                 return 2
-            if re.search(r"/member/(signup|login)|/session", hrefs["url"]) or "Log in" in hrefs["text"][:400]:
+            if re.search(r"/member/(signup|register|login)|/session", hrefs["url"]) or "Sign up | Log in" in hrefs["text"][:400]:
                 print("Your saved session looks logged out. Run `python -m vintedtool login` again.")
                 return 1
             links += [h for h in hrefs["links"] if re.search(r"/items/\d+", h)]
