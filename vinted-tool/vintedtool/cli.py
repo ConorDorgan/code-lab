@@ -67,10 +67,13 @@ def cmd_search(args) -> int:
     import datetime as dt
     conditions = args.condition or []
     with Browser(cache=Cache(enabled=not args.no_cache), headless=not args.headed) as b:
-        print(f"Searching vinted.ie for “{args.query}”…")
+        label_q = " + ".join(args.query)
+        print(f"Searching vinted.ie for “{label_q}”…")
+        must = [w.strip() for w in (args.must_mention or "").split(",") if w.strip()]
         try:
             listings = search(b, args.query, limit=args.limit, max_price=args.max_price, size=args.size,
-                              brand=args.brand, conditions=conditions, details=not args.no_details)
+                              brand=args.brand, conditions=conditions, details=not args.no_details,
+                              item_type=args.type, must_mention=must)
         except Blocked as e:
             print(f"✗ Vinted blocked the search ({e.reason}). Logged to BLOCKERS.md.")
             return 2
@@ -78,10 +81,11 @@ def cmd_search(args) -> int:
         if not listings:
             return 0
         filters = [f"max €{args.max_price:g}" if args.max_price else "", f"size {args.size}" if args.size else "",
-                   f"brand {args.brand}" if args.brand else "", ", ".join(conditions)]
-        meta = [f"Vinted Ireland search: “{args.query}” {' · '.join(f for f in filters if f)}".strip(),
+                   f"brands: {', '.join(args.brand)}" if args.brand else "", ", ".join(conditions),
+                   f"type: {args.type}" if args.type else "", f"must mention: {', '.join(must)}" if must else ""]
+        meta = [f"Vinted Ireland search: “{label_q}” {' · '.join(f for f in filters if f)}".strip(),
                 f"Run {dt.datetime.now():%Y-%m-%d %H:%M}. Sorted by saving %, highest first."]
-        run_pipeline(listings, b, f"Vinted {args.query}", args, meta)
+        run_pipeline(listings, b, args.title or f"Vinted {label_q}", args, meta)
     return 0
 
 
@@ -216,10 +220,13 @@ def main(argv=None) -> int:
         p.add_argument("--out", help="output folder (default ./output)")
 
     s = sub.add_parser("search", help="search vinted.ie")
-    s.add_argument("query")
+    s.add_argument("query", nargs="+", help="one or more search texts (results are merged)")
     s.add_argument("--max-price", type=float, help="max item price in EUR")
     s.add_argument("--size", help='size as Vinted shows it, e.g. "42" or "M"')
-    s.add_argument("--brand", help="brand name, e.g. salomon")
+    s.add_argument("--brand", action="append", help="brand name, e.g. salomon (repeatable: any of them)")
+    s.add_argument("--type", help="item type to keep, e.g. jacket, trainers, boots, trousers")
+    s.add_argument("--must-mention", help='comma-separated words a listing must mention, e.g. "gore tex,gtx"')
+    s.add_argument("--title", help="report title")
     s.add_argument("--condition", action="append", choices=list(config.CONDITIONS),
                    help="repeatable: new_with_tags, new_without_tags, very_good, good, satisfactory")
     s.add_argument("--no-details", action="store_true",

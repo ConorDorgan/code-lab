@@ -1,224 +1,1994 @@
 {
-  "_comment": "Brand -> product lines -> models. Patterns are matched against normalised text (lowercase, letters/digits joined: 'XT-6' -> 'xt6'). 'variants' are optional sub-versions that change the retail price. 'discontinued' marks models no longer sold new.",
-  "salomon": {
-    "name": "Salomon",
-    "aliases": ["salomon"],
-    "lines": {
-      "XT": {"patterns": ["xt"], "models": {
-        "XT-6": {"patterns": ["xt6"], "variants": {"GTX": ["gtx", "gore tex", "goretex", "gor tex"], "Expanse": ["expanse"], "Mindful": ["mindful"], "Advanced": ["advanced", "adv"], "Protective": ["protective"], "Recut": ["recut"], "S/LAB": ["s lab", "slab"]}},
-        "XT-4": {"patterns": ["xt4"], "variants": {"OG": ["og"], "Advanced": ["advanced", "adv"]}},
-        "XT-Wings 2": {"patterns": ["xt wings 2", "xtwings 2", "xt wings"]},
-        "XT-Quest": {"patterns": ["xt quest"]},
-        "XT-Rush": {"patterns": ["xt rush"]},
-        "XT-Slate": {"patterns": ["xt slate"]},
-        "XT-Whisper": {"patterns": ["xt whisper"]},
-        "XT-Pathway": {"patterns": ["xt pathway"]}
-      }},
-      "ACS": {"patterns": ["acs"], "models": {
-        "ACS Pro": {"patterns": ["acs pro"], "variants": {"Advanced": ["advanced", "adv"]}},
-        "ACS+": {"patterns": ["acs plus", "acs+"]}
-      }},
-      "Speedcross": {"patterns": ["speedcross", "speed cross"], "models": {
-        "Speedcross 6": {"patterns": ["speedcross 6", "speed cross 6"], "variants": {"GTX": ["gtx", "gore tex", "goretex"]}},
-        "Speedcross 5": {"patterns": ["speedcross 5", "speed cross 5"], "variants": {"GTX": ["gtx", "gore tex", "goretex"]}, "discontinued": true},
-        "Speedcross 3": {"patterns": ["speedcross 3", "speed cross 3"]}
-      }},
-      "Odyssey": {"patterns": ["odyssey"], "models": {"Odyssey 1": {"patterns": ["odyssey 1", "odyssey elmt"]}}},
-      "Sense": {"patterns": ["sense ride", "s lab"], "models": {
-        "Sense Ride 5": {"patterns": ["sense ride 5"]}
-      }},
-      "Cross Hike": {"patterns": ["cross hike"], "models": {}},
-      "X Ultra": {"patterns": ["x ultra"], "models": {
-        "X Ultra 4": {"patterns": ["x ultra 4"], "variants": {"GTX": ["gtx", "gore tex"], "Mid": ["mid"]}},
-        "X Ultra 360": {"patterns": ["x ultra 360"], "variants": {"GTX": ["gtx", "gore tex"]}}
-      }}
+ "_comment": "Brand -> product lines -> models. Patterns are matched against normalised text (lowercase, letters/digits joined: 'XT-6' -> 'xt6'). 'variants' are optional sub-versions that change the retail price. 'discontinued' marks models no longer sold new.",
+ "salomon": {
+  "name": "Salomon",
+  "aliases": [
+   "salomon"
+  ],
+  "lines": {
+   "XT": {
+    "patterns": [
+     "xt"
+    ],
+    "models": {
+     "XT-6": {
+      "patterns": [
+       "xt6"
+      ],
+      "variants": {
+       "GTX": [
+        "gtx",
+        "gore tex",
+        "goretex",
+        "gor tex"
+       ],
+       "Expanse": [
+        "expanse"
+       ],
+       "Mindful": [
+        "mindful"
+       ],
+       "Advanced": [
+        "advanced",
+        "adv"
+       ],
+       "Protective": [
+        "protective"
+       ],
+       "Recut": [
+        "recut"
+       ],
+       "S/LAB": [
+        "s lab",
+        "slab"
+       ]
+      }
+     },
+     "XT-4": {
+      "patterns": [
+       "xt4"
+      ],
+      "variants": {
+       "OG": [
+        "og"
+       ],
+       "Advanced": [
+        "advanced",
+        "adv"
+       ]
+      }
+     },
+     "XT-Wings 2": {
+      "patterns": [
+       "xt wings 2",
+       "xtwings 2",
+       "xt wings"
+      ]
+     },
+     "XT-Quest": {
+      "patterns": [
+       "xt quest"
+      ]
+     },
+     "XT-Rush": {
+      "patterns": [
+       "xt rush"
+      ]
+     },
+     "XT-Slate": {
+      "patterns": [
+       "xt slate"
+      ]
+     },
+     "XT-Whisper": {
+      "patterns": [
+       "xt whisper"
+      ]
+     },
+     "XT-Pathway": {
+      "patterns": [
+       "xt pathway"
+      ]
+     }
     }
-  },
-  "nike": {
-    "name": "Nike",
-    "aliases": ["nike"],
-    "lines": {
-      "Air Max": {"patterns": ["air max", "airmax"], "models": {
-        "Air Max 1": {"patterns": ["air max 1", "airmax 1", "am1"]},
-        "Air Max 90": {"patterns": ["air max 90", "airmax 90", "am90"]},
-        "Air Max 95": {"patterns": ["air max 95", "airmax 95", "am95"]},
-        "Air Max 97": {"patterns": ["air max 97", "airmax 97", "am97"]},
-        "Air Max Plus": {"patterns": ["air max plus", "airmax plus", "air max tn", "nike tn"]},
-        "Air Max 270": {"patterns": ["air max 270", "airmax 270"]},
-        "Air Max Dn": {"patterns": ["air max dn", "airmax dn"]}
-      }},
-      "Air Force 1": {"patterns": ["air force", "af1"], "models": {
-        "Air Force 1 '07": {"patterns": ["air force 1", "af1", "air force one"], "variants": {"Mid": ["mid"], "High": ["high"]}}
-      }},
-      "Dunk": {"patterns": ["dunk"], "models": {
-        "Dunk Low": {"patterns": ["dunk low"]},
-        "Dunk High": {"patterns": ["dunk high"]}
-      }},
-      "Pegasus": {"patterns": ["pegasus"], "models": {
-        "Pegasus 41": {"patterns": ["pegasus 41"]},
-        "Pegasus 40": {"patterns": ["pegasus 40"], "discontinued": true},
-        "Pegasus Trail 5": {"patterns": ["pegasus trail 5"]}
-      }},
-      "Vomero": {"patterns": ["vomero"], "models": {
-        "Vomero 5": {"patterns": ["vomero 5"]}
-      }},
-      "Cortez": {"patterns": ["cortez"], "models": {"Cortez": {"patterns": ["cortez"]}}},
-      "Blazer": {"patterns": ["blazer"], "models": {
-        "Blazer Mid '77": {"patterns": ["blazer mid"]},
-        "Blazer Low '77": {"patterns": ["blazer low"]}
-      }},
-      "Tech Fleece": {"patterns": ["tech fleece"], "models": {}}
+   },
+   "ACS": {
+    "patterns": [
+     "acs"
+    ],
+    "models": {
+     "ACS Pro": {
+      "patterns": [
+       "acs pro"
+      ],
+      "variants": {
+       "Advanced": [
+        "advanced",
+        "adv"
+       ]
+      }
+     },
+     "ACS+": {
+      "patterns": [
+       "acs plus",
+       "acs+"
+      ]
+     }
     }
-  },
-  "jordan": {
-    "name": "Jordan",
-    "aliases": ["jordan", "air jordan"],
-    "lines": {
-      "Air Jordan": {"patterns": ["jordan"], "models": {
-        "Air Jordan 1 Low": {"patterns": ["jordan 1 low", "aj1 low"]},
-        "Air Jordan 1 Mid": {"patterns": ["jordan 1 mid", "aj1 mid"]},
-        "Air Jordan 1 High": {"patterns": ["jordan 1 high", "jordan 1 retro high", "aj1 high"]},
-        "Air Jordan 4": {"patterns": ["jordan 4", "aj4"]}
-      }}
+   },
+   "Speedcross": {
+    "patterns": [
+     "speedcross",
+     "speed cross"
+    ],
+    "models": {
+     "Speedcross 6": {
+      "patterns": [
+       "speedcross 6",
+       "speed cross 6"
+      ],
+      "variants": {
+       "GTX": [
+        "gtx",
+        "gore tex",
+        "goretex"
+       ]
+      }
+     },
+     "Speedcross 5": {
+      "patterns": [
+       "speedcross 5",
+       "speed cross 5"
+      ],
+      "variants": {
+       "GTX": [
+        "gtx",
+        "gore tex",
+        "goretex"
+       ]
+      },
+      "discontinued": true
+     },
+     "Speedcross 3": {
+      "patterns": [
+       "speedcross 3",
+       "speed cross 3"
+      ]
+     }
     }
-  },
-  "adidas": {
-    "name": "adidas",
-    "aliases": ["adidas"],
-    "lines": {
-      "Originals": {"patterns": ["samba", "gazelle", "spezial", "campus", "superstar", "stan smith", "forum"], "models": {
-        "Samba OG": {"patterns": ["samba og", "samba"]},
-        "Gazelle": {"patterns": ["gazelle"], "variants": {"Indoor": ["indoor"], "Bold": ["bold"]}},
-        "Handball Spezial": {"patterns": ["handball spezial", "spezial"]},
-        "Campus 00s": {"patterns": ["campus 00s", "campus"]},
-        "Superstar": {"patterns": ["superstar"]},
-        "Stan Smith": {"patterns": ["stan smith"]},
-        "Forum Low": {"patterns": ["forum low", "forum"]}
-      }},
-      "Ultraboost": {"patterns": ["ultraboost", "ultra boost"], "models": {
-        "Ultraboost 5": {"patterns": ["ultraboost 5", "ultra boost 5"]},
-        "Ultraboost 1.0": {"patterns": ["ultraboost 1 0", "ultraboost 1.0"]}
-      }},
-      "Adizero": {"patterns": ["adizero"], "models": {
-        "Adizero Adios Pro 3": {"patterns": ["adios pro 3"]},
-        "Adizero SL2": {"patterns": ["adizero sl2", "adizero sl 2"]}
-      }}
+   },
+   "Odyssey": {
+    "patterns": [
+     "odyssey"
+    ],
+    "models": {
+     "Odyssey 1": {
+      "patterns": [
+       "odyssey 1",
+       "odyssey elmt"
+      ]
+     }
     }
-  },
-  "new balance": {
-    "name": "New Balance",
-    "aliases": ["new balance", "newbalance"],
-    "lines": {
-      "Made in USA/UK": {"patterns": ["990", "991", "992", "993", "1500"], "models": {
-        "990v6": {"patterns": ["990v6", "990 v6"]},
-        "990v5": {"patterns": ["990v5", "990 v5"], "discontinued": true},
-        "991v2": {"patterns": ["991v2", "991 v2"]},
-        "992": {"patterns": ["992"]},
-        "993": {"patterns": ["993"]}
-      }},
-      "Lifestyle": {"patterns": ["530", "550", "574", "327", "2002r", "9060", "1906r", "480"], "models": {
-        "530": {"patterns": ["530", "mr530"]},
-        "550": {"patterns": ["550", "bb550"]},
-        "574": {"patterns": ["574"]},
-        "327": {"patterns": ["327"]},
-        "2002R": {"patterns": ["2002r"]},
-        "9060": {"patterns": ["9060"]},
-        "1906R": {"patterns": ["1906r"]},
-        "480": {"patterns": ["480", "bb480"]}
-      }}
+   },
+   "Sense": {
+    "patterns": [
+     "sense ride",
+     "s lab"
+    ],
+    "models": {
+     "Sense Ride 5": {
+      "patterns": [
+       "sense ride 5"
+      ]
+     }
     }
-  },
-  "asics": {
-    "name": "ASICS",
-    "aliases": ["asics"],
-    "lines": {
-      "Gel": {"patterns": ["gel"], "models": {
-        "Gel-Kayano 14": {"patterns": ["kayano 14"]},
-        "Gel-1130": {"patterns": ["gel 1130", "1130"]},
-        "Gel-NYC": {"patterns": ["gel nyc"]},
-        "Gel-Nimbus 26": {"patterns": ["nimbus 26"]},
-        "Gel-Kayano 31": {"patterns": ["kayano 31"]}
-      }},
-      "Novablast": {"patterns": ["novablast"], "models": {"Novablast 5": {"patterns": ["novablast 5"]}, "Novablast 4": {"patterns": ["novablast 4"]}}}
+   },
+   "Cross Hike": {
+    "patterns": [
+     "cross hike"
+    ],
+    "models": {}
+   },
+   "X Ultra": {
+    "patterns": [
+     "x ultra"
+    ],
+    "models": {
+     "X Ultra 4": {
+      "patterns": [
+       "x ultra 4"
+      ],
+      "variants": {
+       "GTX": [
+        "gtx",
+        "gore tex"
+       ],
+       "Mid": [
+        "mid"
+       ]
+      }
+     },
+     "X Ultra 360": {
+      "patterns": [
+       "x ultra 360"
+      ],
+      "variants": {
+       "GTX": [
+        "gtx",
+        "gore tex"
+       ]
+      }
+     }
     }
-  },
-  "hoka": {
-    "name": "HOKA",
-    "aliases": ["hoka", "hoka one one"],
-    "lines": {
-      "Clifton": {"patterns": ["clifton"], "models": {"Clifton 9": {"patterns": ["clifton 9"]}, "Clifton 10": {"patterns": ["clifton 10"]}}},
-      "Bondi": {"patterns": ["bondi"], "models": {"Bondi 9": {"patterns": ["bondi 9"]}, "Bondi 8": {"patterns": ["bondi 8"]}}},
-      "Speedgoat": {"patterns": ["speedgoat"], "models": {"Speedgoat 6": {"patterns": ["speedgoat 6"]}, "Speedgoat 5": {"patterns": ["speedgoat 5"]}}}
-    }
-  },
-  "on": {
-    "name": "On",
-    "aliases": ["on running", "on cloud"],
-    "lines": {
-      "Cloud": {"patterns": ["cloud"], "models": {
-        "Cloud 6": {"patterns": ["cloud 6"]},
-        "Cloud 5": {"patterns": ["cloud 5"]},
-        "Cloudmonster": {"patterns": ["cloudmonster"]},
-        "Cloudsurfer": {"patterns": ["cloudsurfer"]},
-        "Cloudtilt": {"patterns": ["cloudtilt"]}
-      }}
-    }
-  },
-  "the north face": {
-    "name": "The North Face",
-    "aliases": ["the north face", "north face", "tnf"],
-    "lines": {
-      "Nuptse": {"patterns": ["nuptse"], "models": {"1996 Retro Nuptse Jacket": {"patterns": ["1996 retro nuptse", "1996 nuptse", "retro nuptse"]}}},
-      "Denali": {"patterns": ["denali"], "models": {}},
-      "Himalayan": {"patterns": ["himalayan"], "models": {}}
-    }
-  },
-  "arc'teryx": {
-    "name": "Arc'teryx",
-    "aliases": ["arc teryx", "arcteryx", "arc'teryx"],
-    "lines": {
-      "Beta": {"patterns": ["beta"], "models": {"Beta LT Jacket": {"patterns": ["beta lt"]}, "Beta AR Jacket": {"patterns": ["beta ar"]}}},
-      "Atom": {"patterns": ["atom"], "models": {"Atom Hoody": {"patterns": ["atom hoody", "atom hoodie"]}, "Atom Jacket": {"patterns": ["atom jacket"]}}},
-      "Alpha": {"patterns": ["alpha"], "models": {"Alpha SV Jacket": {"patterns": ["alpha sv"]}}}
-    }
-  },
-  "patagonia": {
-    "name": "Patagonia",
-    "aliases": ["patagonia"],
-    "lines": {
-      "Fleece": {"patterns": ["retro x", "better sweater", "synchilla", "snap t"], "models": {
-        "Retro-X Jacket": {"patterns": ["retro x"]},
-        "Better Sweater": {"patterns": ["better sweater"]},
-        "Synchilla Snap-T": {"patterns": ["synchilla", "snap t"]}
-      }},
-      "Down": {"patterns": ["down sweater", "nano puff"], "models": {"Nano Puff Jacket": {"patterns": ["nano puff"]}, "Down Sweater": {"patterns": ["down sweater"]}}}
-    }
-  },
-  "dr. martens": {
-    "name": "Dr. Martens",
-    "aliases": ["dr martens", "dr. martens", "doc martens"],
-    "lines": {
-      "Boots": {"patterns": ["1460", "1461", "jadon", "2976"], "models": {
-        "1460": {"patterns": ["1460"]},
-        "1461": {"patterns": ["1461"]},
-        "Jadon": {"patterns": ["jadon"]},
-        "2976 Chelsea": {"patterns": ["2976"]}
-      }}
-    }
-  },
-  "veja": {
-    "name": "Veja",
-    "aliases": ["veja"],
-    "lines": {"Sneakers": {"patterns": ["v 10", "v10", "campo", "esplar"], "models": {
-      "V-10": {"patterns": ["v10", "v 10"]}, "Campo": {"patterns": ["campo"]}, "Esplar": {"patterns": ["esplar"]}
-    }}}
-  },
-  "converse": {
-    "name": "Converse",
-    "aliases": ["converse"],
-    "lines": {"Chuck": {"patterns": ["chuck", "all star"], "models": {
-      "Chuck 70": {"patterns": ["chuck 70", "chuck taylor 70"], "variants": {"Hi": ["hi", "high"], "Ox": ["ox", "low"]}},
-      "Chuck Taylor All Star": {"patterns": ["chuck taylor all star", "all star"], "variants": {"Hi": ["hi", "high"], "Ox": ["ox", "low"]}}
-    }}}
+   }
   }
+ },
+ "nike": {
+  "name": "Nike",
+  "aliases": [
+   "nike"
+  ],
+  "lines": {
+   "Air Max": {
+    "patterns": [
+     "air max",
+     "airmax"
+    ],
+    "models": {
+     "Air Max 1": {
+      "patterns": [
+       "air max 1",
+       "airmax 1",
+       "am1"
+      ]
+     },
+     "Air Max 90": {
+      "patterns": [
+       "air max 90",
+       "airmax 90",
+       "am90"
+      ]
+     },
+     "Air Max 95": {
+      "patterns": [
+       "air max 95",
+       "airmax 95",
+       "am95"
+      ]
+     },
+     "Air Max 97": {
+      "patterns": [
+       "air max 97",
+       "airmax 97",
+       "am97"
+      ]
+     },
+     "Air Max Plus": {
+      "patterns": [
+       "air max plus",
+       "airmax plus",
+       "air max tn",
+       "nike tn"
+      ]
+     },
+     "Air Max 270": {
+      "patterns": [
+       "air max 270",
+       "airmax 270"
+      ]
+     },
+     "Air Max Dn": {
+      "patterns": [
+       "air max dn",
+       "airmax dn"
+      ]
+     }
+    }
+   },
+   "Air Force 1": {
+    "patterns": [
+     "air force",
+     "af1"
+    ],
+    "models": {
+     "Air Force 1 '07": {
+      "patterns": [
+       "air force 1",
+       "af1",
+       "air force one"
+      ],
+      "variants": {
+       "Mid": [
+        "mid"
+       ],
+       "High": [
+        "high"
+       ]
+      }
+     }
+    }
+   },
+   "Dunk": {
+    "patterns": [
+     "dunk"
+    ],
+    "models": {
+     "Dunk Low": {
+      "patterns": [
+       "dunk low"
+      ]
+     },
+     "Dunk High": {
+      "patterns": [
+       "dunk high"
+      ]
+     }
+    }
+   },
+   "Pegasus": {
+    "patterns": [
+     "pegasus"
+    ],
+    "models": {
+     "Pegasus 41": {
+      "patterns": [
+       "pegasus 41"
+      ]
+     },
+     "Pegasus 40": {
+      "patterns": [
+       "pegasus 40"
+      ],
+      "discontinued": true
+     },
+     "Pegasus Trail 5": {
+      "patterns": [
+       "pegasus trail 5"
+      ]
+     }
+    }
+   },
+   "Vomero": {
+    "patterns": [
+     "vomero"
+    ],
+    "models": {
+     "Vomero 5": {
+      "patterns": [
+       "vomero 5"
+      ]
+     }
+    }
+   },
+   "Cortez": {
+    "patterns": [
+     "cortez"
+    ],
+    "models": {
+     "Cortez": {
+      "patterns": [
+       "cortez"
+      ]
+     }
+    }
+   },
+   "Blazer": {
+    "patterns": [
+     "blazer"
+    ],
+    "models": {
+     "Blazer Mid '77": {
+      "patterns": [
+       "blazer mid"
+      ]
+     },
+     "Blazer Low '77": {
+      "patterns": [
+       "blazer low"
+      ]
+     }
+    }
+   },
+   "Tech Fleece": {
+    "patterns": [
+     "tech fleece"
+    ],
+    "models": {}
+   }
+  }
+ },
+ "jordan": {
+  "name": "Jordan",
+  "aliases": [
+   "jordan",
+   "air jordan"
+  ],
+  "lines": {
+   "Air Jordan": {
+    "patterns": [
+     "jordan"
+    ],
+    "models": {
+     "Air Jordan 1 Low": {
+      "patterns": [
+       "jordan 1 low",
+       "aj1 low"
+      ]
+     },
+     "Air Jordan 1 Mid": {
+      "patterns": [
+       "jordan 1 mid",
+       "aj1 mid"
+      ]
+     },
+     "Air Jordan 1 High": {
+      "patterns": [
+       "jordan 1 high",
+       "jordan 1 retro high",
+       "aj1 high"
+      ]
+     },
+     "Air Jordan 4": {
+      "patterns": [
+       "jordan 4",
+       "aj4"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "adidas": {
+  "name": "adidas",
+  "aliases": [
+   "adidas"
+  ],
+  "lines": {
+   "Originals": {
+    "patterns": [
+     "samba",
+     "gazelle",
+     "spezial",
+     "campus",
+     "superstar",
+     "stan smith",
+     "forum"
+    ],
+    "models": {
+     "Samba OG": {
+      "patterns": [
+       "samba og",
+       "samba"
+      ]
+     },
+     "Gazelle": {
+      "patterns": [
+       "gazelle"
+      ],
+      "variants": {
+       "Indoor": [
+        "indoor"
+       ],
+       "Bold": [
+        "bold"
+       ]
+      }
+     },
+     "Handball Spezial": {
+      "patterns": [
+       "handball spezial",
+       "spezial"
+      ]
+     },
+     "Campus 00s": {
+      "patterns": [
+       "campus 00s",
+       "campus"
+      ]
+     },
+     "Superstar": {
+      "patterns": [
+       "superstar"
+      ]
+     },
+     "Stan Smith": {
+      "patterns": [
+       "stan smith"
+      ]
+     },
+     "Forum Low": {
+      "patterns": [
+       "forum low",
+       "forum"
+      ]
+     }
+    }
+   },
+   "Ultraboost": {
+    "patterns": [
+     "ultraboost",
+     "ultra boost"
+    ],
+    "models": {
+     "Ultraboost 5": {
+      "patterns": [
+       "ultraboost 5",
+       "ultra boost 5"
+      ]
+     },
+     "Ultraboost 1.0": {
+      "patterns": [
+       "ultraboost 1 0",
+       "ultraboost 1.0"
+      ]
+     }
+    }
+   },
+   "Adizero": {
+    "patterns": [
+     "adizero"
+    ],
+    "models": {
+     "Adizero Adios Pro 3": {
+      "patterns": [
+       "adios pro 3"
+      ]
+     },
+     "Adizero SL2": {
+      "patterns": [
+       "adizero sl2",
+       "adizero sl 2"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "new balance": {
+  "name": "New Balance",
+  "aliases": [
+   "new balance",
+   "newbalance"
+  ],
+  "lines": {
+   "Made in USA/UK": {
+    "patterns": [
+     "990",
+     "991",
+     "992",
+     "993",
+     "1500"
+    ],
+    "models": {
+     "990v6": {
+      "patterns": [
+       "990v6",
+       "990 v6"
+      ]
+     },
+     "990v5": {
+      "patterns": [
+       "990v5",
+       "990 v5"
+      ],
+      "discontinued": true
+     },
+     "991v2": {
+      "patterns": [
+       "991v2",
+       "991 v2"
+      ]
+     },
+     "992": {
+      "patterns": [
+       "992"
+      ]
+     },
+     "993": {
+      "patterns": [
+       "993"
+      ]
+     }
+    }
+   },
+   "Lifestyle": {
+    "patterns": [
+     "530",
+     "550",
+     "574",
+     "327",
+     "2002r",
+     "9060",
+     "1906r",
+     "480"
+    ],
+    "models": {
+     "530": {
+      "patterns": [
+       "530",
+       "mr530"
+      ]
+     },
+     "550": {
+      "patterns": [
+       "550",
+       "bb550"
+      ]
+     },
+     "574": {
+      "patterns": [
+       "574"
+      ]
+     },
+     "327": {
+      "patterns": [
+       "327"
+      ]
+     },
+     "2002R": {
+      "patterns": [
+       "2002r"
+      ]
+     },
+     "9060": {
+      "patterns": [
+       "9060"
+      ]
+     },
+     "1906R": {
+      "patterns": [
+       "1906r"
+      ]
+     },
+     "480": {
+      "patterns": [
+       "480",
+       "bb480"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "asics": {
+  "name": "ASICS",
+  "aliases": [
+   "asics"
+  ],
+  "lines": {
+   "Gel": {
+    "patterns": [
+     "gel"
+    ],
+    "models": {
+     "Gel-Kayano 14": {
+      "patterns": [
+       "kayano 14"
+      ]
+     },
+     "Gel-1130": {
+      "patterns": [
+       "gel 1130",
+       "1130"
+      ]
+     },
+     "Gel-NYC": {
+      "patterns": [
+       "gel nyc"
+      ]
+     },
+     "Gel-Nimbus 26": {
+      "patterns": [
+       "nimbus 26"
+      ]
+     },
+     "Gel-Kayano 31": {
+      "patterns": [
+       "kayano 31"
+      ]
+     }
+    }
+   },
+   "Novablast": {
+    "patterns": [
+     "novablast"
+    ],
+    "models": {
+     "Novablast 5": {
+      "patterns": [
+       "novablast 5"
+      ]
+     },
+     "Novablast 4": {
+      "patterns": [
+       "novablast 4"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "hoka": {
+  "name": "HOKA",
+  "aliases": [
+   "hoka",
+   "hoka one one"
+  ],
+  "lines": {
+   "Clifton": {
+    "patterns": [
+     "clifton"
+    ],
+    "models": {
+     "Clifton 9": {
+      "patterns": [
+       "clifton 9"
+      ]
+     },
+     "Clifton 10": {
+      "patterns": [
+       "clifton 10"
+      ]
+     }
+    }
+   },
+   "Bondi": {
+    "patterns": [
+     "bondi"
+    ],
+    "models": {
+     "Bondi 9": {
+      "patterns": [
+       "bondi 9"
+      ]
+     },
+     "Bondi 8": {
+      "patterns": [
+       "bondi 8"
+      ]
+     }
+    }
+   },
+   "Speedgoat": {
+    "patterns": [
+     "speedgoat"
+    ],
+    "models": {
+     "Speedgoat 6": {
+      "patterns": [
+       "speedgoat 6"
+      ]
+     },
+     "Speedgoat 5": {
+      "patterns": [
+       "speedgoat 5"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "on": {
+  "name": "On",
+  "aliases": [
+   "on running",
+   "on cloud"
+  ],
+  "lines": {
+   "Cloud": {
+    "patterns": [
+     "cloud"
+    ],
+    "models": {
+     "Cloud 6": {
+      "patterns": [
+       "cloud 6"
+      ]
+     },
+     "Cloud 5": {
+      "patterns": [
+       "cloud 5"
+      ]
+     },
+     "Cloudmonster": {
+      "patterns": [
+       "cloudmonster"
+      ]
+     },
+     "Cloudsurfer": {
+      "patterns": [
+       "cloudsurfer"
+      ]
+     },
+     "Cloudtilt": {
+      "patterns": [
+       "cloudtilt"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "the north face": {
+  "name": "The North Face",
+  "aliases": [
+   "the north face",
+   "north face",
+   "tnf"
+  ],
+  "lines": {
+   "Nuptse": {
+    "patterns": [
+     "nuptse"
+    ],
+    "models": {
+     "1996 Retro Nuptse Jacket": {
+      "patterns": [
+       "1996 retro nuptse",
+       "1996 nuptse",
+       "retro nuptse"
+      ]
+     }
+    }
+   },
+   "Denali": {
+    "patterns": [
+     "denali"
+    ],
+    "models": {}
+   },
+   "Himalayan": {
+    "patterns": [
+     "himalayan"
+    ],
+    "models": {}
+   },
+   "Mountain Light": {
+    "patterns": [
+     "mountain light"
+    ],
+    "models": {
+     "Mountain Light Triclimate GTX Jacket": {
+      "patterns": [
+       "mountain light triclimate"
+      ]
+     },
+     "Mountain Light FutureLight Jacket": {
+      "patterns": [
+       "mountain light futurelight"
+      ]
+     }
+    }
+   },
+   "Summit Series": {
+    "patterns": [
+     "summit series",
+     "summit"
+    ],
+    "models": {
+     "Summit L5 GTX Pro Jacket": {
+      "patterns": [
+       "summit l5"
+      ]
+     },
+     "Summit Torre Egger Jacket": {
+      "patterns": [
+       "torre egger"
+      ]
+     }
+    }
+   },
+   "Mountain Jacket": {
+    "patterns": [
+     "mountain jacket"
+    ],
+    "models": {
+     "GORE-TEX Mountain Jacket": {
+      "patterns": [
+       "gore tex mountain jacket",
+       "mountain jacket gore tex",
+       "mountain jacket gtx",
+       "1990 mountain jacket",
+       "1986 mountain jacket",
+       "1994 retro mountain light"
+      ]
+     }
+    }
+   },
+   "Jazzi": {
+    "patterns": [
+     "jazzi"
+    ],
+    "models": {
+     "Jazzi 3L GORE-TEX Jacket": {
+      "patterns": [
+       "jazzi"
+      ]
+     }
+    }
+   },
+   "Dryzzle": {
+    "patterns": [
+     "dryzzle"
+    ],
+    "models": {
+     "Dryzzle FutureLight Jacket": {
+      "patterns": [
+       "dryzzle"
+      ]
+     }
+    }
+   },
+   "Quest": {
+    "patterns": [
+     "quest"
+    ],
+    "models": {}
+   }
+  }
+ },
+ "arc'teryx": {
+  "name": "Arc'teryx",
+  "aliases": [
+   "arc teryx",
+   "arcteryx",
+   "arc'teryx",
+   "arcterix",
+   "arcterys"
+  ],
+  "lines": {
+   "Beta": {
+    "patterns": [
+     "beta"
+    ],
+    "models": {
+     "Beta LT Jacket": {
+      "patterns": [
+       "beta lt"
+      ]
+     },
+     "Beta AR Jacket": {
+      "patterns": [
+       "beta ar"
+      ]
+     },
+     "Beta SV Jacket": {
+      "patterns": [
+       "beta sv"
+      ]
+     },
+     "Beta SL Jacket": {
+      "patterns": [
+       "beta sl"
+      ]
+     },
+     "Beta Jacket": {
+      "patterns": [
+       "beta jacket",
+       "beta gore tex",
+       "beta gtx",
+       "beta hybrid"
+      ]
+     }
+    }
+   },
+   "Zeta": {
+    "patterns": [
+     "zeta"
+    ],
+    "models": {
+     "Zeta SL Jacket": {
+      "patterns": [
+       "zeta sl"
+      ]
+     },
+     "Zeta LT Jacket": {
+      "patterns": [
+       "zeta lt"
+      ]
+     },
+     "Zeta AR Jacket": {
+      "patterns": [
+       "zeta ar"
+      ]
+     },
+     "Zeta FL Jacket": {
+      "patterns": [
+       "zeta fl"
+      ]
+     }
+    }
+   },
+   "Alpha": {
+    "patterns": [
+     "alpha"
+    ],
+    "models": {
+     "Alpha SV Jacket": {
+      "patterns": [
+       "alpha sv"
+      ]
+     },
+     "Alpha AR Jacket": {
+      "patterns": [
+       "alpha ar"
+      ]
+     },
+     "Alpha SL Jacket": {
+      "patterns": [
+       "alpha sl"
+      ]
+     },
+     "Alpha FL Jacket": {
+      "patterns": [
+       "alpha fl"
+      ]
+     }
+    }
+   },
+   "Sabre": {
+    "patterns": [
+     "sabre"
+    ],
+    "models": {
+     "Sabre Jacket": {
+      "patterns": [
+       "sabre"
+      ]
+     },
+     "Sabre AR Jacket": {
+      "patterns": [
+       "sabre ar"
+      ]
+     },
+     "Sabre LT Jacket": {
+      "patterns": [
+       "sabre lt"
+      ]
+     }
+    }
+   },
+   "Rush": {
+    "patterns": [
+     "rush"
+    ],
+    "models": {
+     "Rush Jacket": {
+      "patterns": [
+       "rush jacket"
+      ]
+     },
+     "Rush LT Jacket": {
+      "patterns": [
+       "rush lt"
+      ]
+     }
+    }
+   },
+   "Atom": {
+    "patterns": [
+     "atom"
+    ],
+    "models": {
+     "Atom Hoody": {
+      "patterns": [
+       "atom hoody",
+       "atom hoodie"
+      ]
+     },
+     "Atom Jacket": {
+      "patterns": [
+       "atom jacket"
+      ]
+     }
+    }
+   },
+   "Gamma": {
+    "patterns": [
+     "gamma"
+    ],
+    "models": {}
+   },
+   "Solano": {
+    "patterns": [
+     "solano"
+    ],
+    "models": {}
+   },
+   "Theta": {
+    "patterns": [
+     "theta"
+    ],
+    "models": {
+     "Theta AR Jacket": {
+      "patterns": [
+       "theta ar"
+      ]
+     },
+     "Theta SV Jacket": {
+      "patterns": [
+       "theta sv"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "patagonia": {
+  "name": "Patagonia",
+  "aliases": [
+   "patagonia"
+  ],
+  "lines": {
+   "Fleece": {
+    "patterns": [
+     "retro x",
+     "better sweater",
+     "synchilla",
+     "snap t"
+    ],
+    "models": {
+     "Retro-X Jacket": {
+      "patterns": [
+       "retro x"
+      ]
+     },
+     "Better Sweater": {
+      "patterns": [
+       "better sweater"
+      ]
+     },
+     "Synchilla Snap-T": {
+      "patterns": [
+       "synchilla",
+       "snap t"
+      ]
+     }
+    }
+   },
+   "Down": {
+    "patterns": [
+     "down sweater",
+     "nano puff"
+    ],
+    "models": {
+     "Nano Puff Jacket": {
+      "patterns": [
+       "nano puff"
+      ]
+     },
+     "Down Sweater": {
+      "patterns": [
+       "down sweater"
+      ]
+     }
+    }
+   },
+   "Shells": {
+    "patterns": [
+     "torrentshell",
+     "triolet",
+     "calcite",
+     "granite crest",
+     "super free alpine",
+     "storm10",
+     "descensionist"
+    ],
+    "models": {
+     "Triolet Jacket": {
+      "patterns": [
+       "triolet"
+      ]
+     },
+     "Calcite Jacket": {
+      "patterns": [
+       "calcite"
+      ]
+     },
+     "Granite Crest Jacket": {
+      "patterns": [
+       "granite crest"
+      ]
+     },
+     "Torrentshell 3L Jacket": {
+      "patterns": [
+       "torrentshell"
+      ]
+     },
+     "SuperFree Alpine Jacket": {
+      "patterns": [
+       "super free alpine",
+       "superfree alpine"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "dr. martens": {
+  "name": "Dr. Martens",
+  "aliases": [
+   "dr martens",
+   "dr. martens",
+   "doc martens"
+  ],
+  "lines": {
+   "Boots": {
+    "patterns": [
+     "1460",
+     "1461",
+     "jadon",
+     "2976"
+    ],
+    "models": {
+     "1460": {
+      "patterns": [
+       "1460"
+      ]
+     },
+     "1461": {
+      "patterns": [
+       "1461"
+      ]
+     },
+     "Jadon": {
+      "patterns": [
+       "jadon"
+      ]
+     },
+     "2976 Chelsea": {
+      "patterns": [
+       "2976"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "veja": {
+  "name": "Veja",
+  "aliases": [
+   "veja"
+  ],
+  "lines": {
+   "Sneakers": {
+    "patterns": [
+     "v 10",
+     "v10",
+     "campo",
+     "esplar"
+    ],
+    "models": {
+     "V-10": {
+      "patterns": [
+       "v10",
+       "v 10"
+      ]
+     },
+     "Campo": {
+      "patterns": [
+       "campo"
+      ]
+     },
+     "Esplar": {
+      "patterns": [
+       "esplar"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "converse": {
+  "name": "Converse",
+  "aliases": [
+   "converse"
+  ],
+  "lines": {
+   "Chuck": {
+    "patterns": [
+     "chuck",
+     "all star"
+    ],
+    "models": {
+     "Chuck 70": {
+      "patterns": [
+       "chuck 70",
+       "chuck taylor 70"
+      ],
+      "variants": {
+       "Hi": [
+        "hi",
+        "high"
+       ],
+       "Ox": [
+        "ox",
+        "low"
+       ]
+      }
+     },
+     "Chuck Taylor All Star": {
+      "patterns": [
+       "chuck taylor all star",
+       "all star"
+      ],
+      "variants": {
+       "Hi": [
+        "hi",
+        "high"
+       ],
+       "Ox": [
+        "ox",
+        "low"
+       ]
+      }
+     }
+    }
+   }
+  }
+ },
+ "rab": {
+  "name": "Rab",
+  "aliases": [
+   "rab"
+  ],
+  "lines": {
+   "Waterproofs": {
+    "patterns": [
+     "downpour",
+     "kinetic",
+     "latok",
+     "firewall",
+     "muztag",
+     "namche",
+     "kangri",
+     "arc eco",
+     "xenon",
+     "microlight",
+     "nexus"
+    ],
+    "models": {
+     "Downpour Eco Jacket": {
+      "patterns": [
+       "downpour eco",
+       "downpour"
+      ]
+     },
+     "Downpour Plus Jacket": {
+      "patterns": [
+       "downpour plus"
+      ]
+     },
+     "Kinetic Alpine Jacket": {
+      "patterns": [
+       "kinetic alpine"
+      ]
+     },
+     "Kinetic Jacket": {
+      "patterns": [
+       "kinetic"
+      ]
+     },
+     "Latok Mountain GTX Jacket": {
+      "patterns": [
+       "latok"
+      ]
+     },
+     "Firewall Jacket": {
+      "patterns": [
+       "firewall"
+      ]
+     },
+     "Muztag GTX Jacket": {
+      "patterns": [
+       "muztag"
+      ]
+     },
+     "Namche GTX Jacket": {
+      "patterns": [
+       "namche"
+      ]
+     },
+     "Kangri GTX Jacket": {
+      "patterns": [
+       "kangri"
+      ]
+     },
+     "Arc Eco Jacket": {
+      "patterns": [
+       "arc eco"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "mammut": {
+  "name": "Mammut",
+  "aliases": [
+   "mammut"
+  ],
+  "lines": {
+   "Hardshells": {
+    "patterns": [
+     "convey",
+     "crater",
+     "nordwand",
+     "alto guide",
+     "taiss",
+     "ayako",
+     "masao",
+     "nordwand"
+    ],
+    "models": {
+     "Convey Tour HS Hooded Jacket": {
+      "patterns": [
+       "convey tour",
+       "convey"
+      ]
+     },
+     "Crater HS Hooded Jacket": {
+      "patterns": [
+       "crater"
+      ]
+     },
+     "Nordwand Pro HS Hooded Jacket": {
+      "patterns": [
+       "nordwand"
+      ]
+     },
+     "Alto Guide HS Hooded Jacket": {
+      "patterns": [
+       "alto guide"
+      ]
+     },
+     "Taiss HS Hooded Jacket": {
+      "patterns": [
+       "taiss"
+      ]
+     },
+     "Ayako Tour HS Hooded Jacket": {
+      "patterns": [
+       "ayako"
+      ]
+     },
+     "Masao HS Jacket": {
+      "patterns": [
+       "masao"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "berghaus": {
+  "name": "Berghaus",
+  "aliases": [
+   "berghaus"
+  ],
+  "lines": {
+   "Waterproofs": {
+    "patterns": [
+     "paclite",
+     "hillwalker",
+     "extrem",
+     "mehan",
+     "stormcloud",
+     "deluge",
+     "lochnagar",
+     "arran",
+     "maitland"
+    ],
+    "models": {
+     "Paclite 2.0 GTX Jacket": {
+      "patterns": [
+       "paclite 2",
+       "paclite"
+      ]
+     },
+     "Paclite Peak Vent GTX Jacket": {
+      "patterns": [
+       "paclite peak"
+      ]
+     },
+     "Hillwalker GTX Jacket": {
+      "patterns": [
+       "hillwalker"
+      ]
+     },
+     "Mehan Vented Jacket": {
+      "patterns": [
+       "mehan"
+      ]
+     },
+     "Extrem MTN Guide GTX Jacket": {
+      "patterns": [
+       "extrem"
+      ]
+     },
+     "Maitland GTX Jacket": {
+      "patterns": [
+       "maitland"
+      ]
+     },
+     "Arran Jacket": {
+      "patterns": [
+       "arran"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "haglöfs": {
+  "name": "Haglöfs",
+  "aliases": [
+   "haglofs",
+   "haglöfs"
+  ],
+  "lines": {
+   "Shells": {
+    "patterns": [
+     "l i m",
+     "lim",
+     "roc",
+     "spitz",
+     "vassi",
+     "astral",
+     "front"
+    ],
+    "models": {
+     "L.I.M GTX Jacket": {
+      "patterns": [
+       "l i m gtx",
+       "lim gtx",
+       "l i m gore tex",
+       "lim gore tex"
+      ]
+     },
+     "L.I.M Proof Jacket": {
+      "patterns": [
+       "l i m proof",
+       "lim proof"
+      ]
+     },
+     "Roc GTX Jacket": {
+      "patterns": [
+       "roc gtx",
+       "roc gore tex",
+       "roc flash",
+       "roc sight"
+      ]
+     },
+     "Spitz GTX Pro Jacket": {
+      "patterns": [
+       "spitz"
+      ]
+     },
+     "Vassi GTX Pro Jacket": {
+      "patterns": [
+       "vassi"
+      ]
+     },
+     "Astral GTX Jacket": {
+      "patterns": [
+       "astral"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "montane": {
+  "name": "Montane",
+  "aliases": [
+   "montane"
+  ],
+  "lines": {
+   "Waterproofs": {
+    "patterns": [
+     "phase",
+     "pac plus",
+     "spirit",
+     "ajax",
+     "minimus",
+     "solution",
+     "alpine"
+    ],
+    "models": {
+     "Phase Jacket": {
+      "patterns": [
+       "phase"
+      ]
+     },
+     "Phase Lite Jacket": {
+      "patterns": [
+       "phase lite"
+      ]
+     },
+     "Pac Plus Jacket": {
+      "patterns": [
+       "pac plus"
+      ]
+     },
+     "Spirit Jacket": {
+      "patterns": [
+       "spirit"
+      ]
+     },
+     "Ajax Jacket": {
+      "patterns": [
+       "ajax"
+      ]
+     },
+     "Minimus Jacket": {
+      "patterns": [
+       "minimus"
+      ]
+     },
+     "Alpine Resolve Jacket": {
+      "patterns": [
+       "alpine resolve"
+      ]
+     },
+     "Solution Jacket": {
+      "patterns": [
+       "solution"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "norrøna": {
+  "name": "Norrøna",
+  "aliases": [
+   "norrona",
+   "norrøna",
+   "norröna"
+  ],
+  "lines": {
+   "Shells": {
+    "patterns": [
+     "falketind",
+     "lofoten",
+     "trollveggen",
+     "bitihorn",
+     "lyngen",
+     "svalbard",
+     "senja"
+    ],
+    "models": {
+     "Falketind GORE-TEX Jacket": {
+      "patterns": [
+       "falketind"
+      ]
+     },
+     "Lofoten GORE-TEX Pro Jacket": {
+      "patterns": [
+       "lofoten"
+      ]
+     },
+     "Trollveggen GORE-TEX Pro Jacket": {
+      "patterns": [
+       "trollveggen"
+      ]
+     },
+     "Bitihorn Jacket": {
+      "patterns": [
+       "bitihorn"
+      ]
+     },
+     "Lyngen Jacket": {
+      "patterns": [
+       "lyngen"
+      ]
+     },
+     "Svalbard Jacket": {
+      "patterns": [
+       "svalbard"
+      ]
+     },
+     "Senja Jacket": {
+      "patterns": [
+       "senja"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "mountain equipment": {
+  "name": "Mountain Equipment",
+  "aliases": [
+   "mountain equipment"
+  ],
+  "lines": {
+   "Shells": {
+    "patterns": [
+     "lhotse",
+     "manaslu",
+     "makalu",
+     "odyssey",
+     "tupilak",
+     "garwhal",
+     "rupal",
+     "saltoro",
+     "zeno"
+    ],
+    "models": {
+     "Lhotse Jacket": {
+      "patterns": [
+       "lhotse"
+      ]
+     },
+     "Manaslu Jacket": {
+      "patterns": [
+       "manaslu"
+      ]
+     },
+     "Makalu Jacket": {
+      "patterns": [
+       "makalu"
+      ]
+     },
+     "Odyssey Jacket": {
+      "patterns": [
+       "odyssey"
+      ]
+     },
+     "Tupilak Jacket": {
+      "patterns": [
+       "tupilak"
+      ]
+     },
+     "Garwhal Jacket": {
+      "patterns": [
+       "garwhal"
+      ]
+     },
+     "Rupal Jacket": {
+      "patterns": [
+       "rupal"
+      ]
+     },
+     "Saltoro Jacket": {
+      "patterns": [
+       "saltoro"
+      ]
+     },
+     "Zeno Jacket": {
+      "patterns": [
+       "zeno"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "marmot": {
+  "name": "Marmot",
+  "aliases": [
+   "marmot"
+  ],
+  "lines": {
+   "Shells": {
+    "patterns": [
+     "minimalist",
+     "precip",
+     "knife edge",
+     "alpinist"
+    ],
+    "models": {
+     "Minimalist GORE-TEX Jacket": {
+      "patterns": [
+       "minimalist"
+      ]
+     },
+     "PreCip Eco Jacket": {
+      "patterns": [
+       "precip"
+      ]
+     },
+     "Alpinist GORE-TEX Jacket": {
+      "patterns": [
+       "alpinist"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "peak performance": {
+  "name": "Peak Performance",
+  "aliases": [
+   "peak performance"
+  ],
+  "lines": {
+   "Shells": {
+    "patterns": [
+     "vislight",
+     "alpine",
+     "gravity",
+     "pac"
+    ],
+    "models": {
+     "Vislight GTX Jacket": {
+      "patterns": [
+       "vislight"
+      ]
+     },
+     "Alpine GTX Jacket": {
+      "patterns": [
+       "alpine gore tex",
+       "alpine gtx"
+      ]
+     },
+     "Gravity GTX Jacket": {
+      "patterns": [
+       "gravity"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "montbell": {
+  "name": "Montbell",
+  "aliases": [
+   "montbell",
+   "mont bell",
+   "mont-bell"
+  ],
+  "lines": {
+   "Rainwear": {
+    "patterns": [
+     "storm cruiser",
+     "rain dancer",
+     "rain trekker",
+     "thunder pass",
+     "torrent flier",
+     "versalite",
+     "peak shell",
+     "stretch rain",
+     "rain hiker",
+     "alpine light"
+    ],
+    "models": {
+     "Storm Cruiser Jacket": {
+      "patterns": [
+       "storm cruiser"
+      ]
+     },
+     "Rain Dancer Jacket": {
+      "patterns": [
+       "rain dancer"
+      ]
+     },
+     "Rain Trekker Jacket": {
+      "patterns": [
+       "rain trekker"
+      ]
+     },
+     "Thunder Pass Jacket": {
+      "patterns": [
+       "thunder pass"
+      ]
+     },
+     "Torrent Flier Jacket": {
+      "patterns": [
+       "torrent flier",
+       "torrent flyer"
+      ]
+     },
+     "Versalite Jacket": {
+      "patterns": [
+       "versalite"
+      ]
+     },
+     "Peak Shell Jacket": {
+      "patterns": [
+       "peak shell"
+      ]
+     },
+     "Rain Hiker Jacket": {
+      "patterns": [
+       "rain hiker"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "goldwin": {
+  "name": "Goldwin",
+  "aliases": [
+   "goldwin"
+  ],
+  "lines": {
+   "Shells": {
+    "patterns": [
+     "paclite",
+     "mountain",
+     "rain"
+    ],
+    "models": {
+     "GORE-TEX Paclite Jacket": {
+      "patterns": [
+       "paclite"
+      ]
+     },
+     "GORE-TEX Mountain Jacket": {
+      "patterns": [
+       "gore tex mountain jacket"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "nanamica": {
+  "name": "nanamica",
+  "aliases": [
+   "nanamica"
+  ],
+  "lines": {
+   "GORE-TEX": {
+    "patterns": [
+     "cruiser",
+     "soutien collar",
+     "shell",
+     "trench",
+     "balmacaan"
+    ],
+    "models": {
+     "GORE-TEX Cruiser Jacket": {
+      "patterns": [
+       "cruiser jacket",
+       "cruiser"
+      ]
+     },
+     "GORE-TEX Soutien Collar Coat": {
+      "patterns": [
+       "soutien collar"
+      ]
+     },
+     "GORE-TEX Shell Jacket": {
+      "patterns": [
+       "shell jacket"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "snow peak": {
+  "name": "Snow Peak",
+  "aliases": [
+   "snow peak",
+   "snowpeak"
+  ],
+  "lines": {
+   "Rainwear": {
+    "patterns": [
+     "rain jacket",
+     "3l",
+     "2l"
+    ],
+    "models": {
+     "3L Rain Jacket": {
+      "patterns": [
+       "3l rain"
+      ]
+     },
+     "2.5L Rain Jacket": {
+      "patterns": [
+       "2 5l rain",
+       "2 5 l rain"
+      ]
+     }
+    }
+   }
+  }
+ }
 }

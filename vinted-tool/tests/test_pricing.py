@@ -177,3 +177,26 @@ def test_discontinued_flag(tmp_path):
     f = PriceFinder(FakeBrowser(), Cache(tmp_path), retailers=[])
     res = f.find(ident)
     assert res.discontinued and "discontinued" in res.status
+
+
+def test_jacket_matching_uses_url_brand_and_exact_model():
+    beta = identify_text("Veste Arc'teryx Beta Gore-Tex noire", brand_field="Arc'teryx")
+    assert beta.model == "Beta Jacket" and beta.item_type == "jacket"
+    eb = "https://www.ellis-brigham.com/arcteryx-mens-beta-gore-tex-jacket-233108901"
+    assert match_level(beta, "Beta GORE-TEX Jacket", url=eb) == "high"          # brand only in URL
+    assert match_level(beta, "Beta AR GORE-TEX Jacket",
+                       url="https://www.ellis-brigham.com/arcteryx-mens-beta-ar-gore-tex-jacket-1") is None
+    assert match_level(beta, "Beta GORE-TEX Jacket") is None                   # no brand anywhere
+    rab = identify_text("Rab Downpour jacket", brand_field="Rab")
+    assert match_level(rab, "Downpour Pants - Regular Leg",
+                       url="https://www.ellis-brigham.com/rab-mens-downpour-pants-regular-leg-213636901") is None
+    assert identify_text("Haglöfs L.I.M GTX jacket", brand_field="Haglöfs").model == "L.I.M GTX Jacket"
+    assert identify_text("Norrøna falketind", brand_field="Norrøna").brand == "Norrøna"
+
+
+def test_footwear_only_shop_skipped_for_jackets(tmp_path):
+    f = PriceFinder(FakeBrowser(), Cache(tmp_path))
+    names = [rt.name for _, rt in f.sources_for(identify_text("Rab Downpour jacket", brand_field="Rab"))]
+    assert "Foot Locker IE" not in names and "Ellis Brigham" in names
+    names = [rt.name for _, rt in f.sources_for(xt6())]
+    assert "Foot Locker IE" in names

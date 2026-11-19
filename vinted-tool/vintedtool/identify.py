@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import re
+import unicodedata
 from dataclasses import asdict, dataclass, field
 from functools import lru_cache
 from pathlib import Path
@@ -70,10 +71,14 @@ class Identification:
 
 # ------------------------------------------------------------------ text normalisation
 
+_FOLD = str.maketrans({"ø": "o", "æ": "ae", "ß": "ss", "œ": "oe", "ł": "l", "đ": "d"})
+
 def norm(text: str) -> str:
     """Lowercase, strip punctuation and split letter/number runs, so 'XT-6', 'xt6' and 'XT 6'
     all become 'xt 6' and '990v6' becomes '990 v 6'. Patterns get the same treatment."""
     t = (text or "").lower().replace("'", "").replace("’", "").replace("+", " plus ")
+    t = t.translate(_FOLD)
+    t = unicodedata.normalize("NFKD", t).encode("ascii", "ignore").decode()
     t = re.sub(r"[^a-z0-9]+", " ", t)
     t = re.sub(r"(?<=[a-z])(?=\d)|(?<=\d)(?=[a-z])", " ", t)
     return re.sub(r"\s+", " ", t).strip()
@@ -96,12 +101,14 @@ ITEM_TYPES = {
                  "turnschuhe", "zapatillas", "scarpe", "chaussures", "shoes"],
     "boots": ["boots", "boot", "bottes", "stiefel", "botas", "chelsea"],
     "sandals": ["sandals", "sliders", "slides", "sandales"],
-    "jacket": ["jacket", "coat", "parka", "puffer", "veste", "doudoune", "jacke", "giacca", "anorak", "shell"],
+    "jacket": ["jacket", "jackets", "coat", "coats", "parka", "puffer", "veste", "doudoune", "jacke", "giacca",
+               "anorak", "shell", "hardshell", "hoody", "chaqueta", "jas", "kurtka", "outerwear", "raincoat",
+               "waterproof jacket", "regenjacke", "blouson", "manteau"],
     "fleece": ["fleece", "polaire"],
-    "hoodie": ["hoodie", "hoody", "sweatshirt", "sweat", "jumper", "sweater", "pullover", "pull", "crewneck"],
+    "hoodie": ["hoodie", "sweatshirt", "sweat", "jumper", "sweater", "pullover", "pull", "crewneck"],
     "t-shirt": ["t shirt", "tshirt", "tee"],
     "shirt": ["shirt", "chemise"],
-    "trousers": ["trousers", "pants", "joggers", "pantalon", "hose", "cargo"],
+    "trousers": ["trousers", "pants", "joggers", "pantalon", "hose", "cargo", "bib", "salopettes", "leg"],
     "jeans": ["jeans", "denim"],
     "shorts": ["shorts", "short"],
     "dress": ["dress", "robe"],

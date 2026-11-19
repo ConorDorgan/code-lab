@@ -63,7 +63,8 @@ class Retailer:
     currency: str
     kind: str  # "brand" (brand's own site) or "retailer"
     brands: list[str] = field(default_factory=list)  # for brand sites: which brands it sells
-    product_url_hint: str = ""  # substring every product link contains (filters nav links)
+    product_url_hint: str = ""  # regex every product link matches (filters nav links)
+    item_types: list[str] = field(default_factory=list)  # only used for these item types (empty = all)
 
 
 # Price sources after SerpAPI, in the order the brief asks for:
@@ -71,15 +72,21 @@ class Retailer:
 RETAILERS: list[Retailer] = [
     Retailer("salomon_ie", "Salomon IE", "https://www.salomon.com/en-ie/search?q={q}", "EUR", "brand", ["salomon"], "/product/"),
     Retailer("salomon_gb", "Salomon UK", "https://www.salomon.com/en-gb/search?q={q}", "GBP", "brand", ["salomon"], "/product/"),
+    Retailer("tnf_ie", "The North Face IE", "https://www.thenorthface.ie/search?q={q}", "EUR", "brand", ["the north face"], r"\.html"),
+    Retailer("arcteryx_ie", "Arc'teryx IE", "https://arcteryx.com/ie/en/search?q={q}", "EUR", "brand", ["arc'teryx"], "/shop/"),
+    Retailer("montbell_uk", "Montbell UK", "https://www.montbell.co.uk/search?q={q}", "GBP", "brand", ["montbell"], "/products/"),
     Retailer("nike_ie", "Nike IE", "https://www.nike.com/ie/w?q={q}", "EUR", "brand", ["nike", "jordan"], "/t/"),
-    Retailer("adidas_ie", "adidas IE", "https://www.adidas.ie/search?q={q}", "EUR", "brand", ["adidas"], ".html"),
+    Retailer("adidas_ie", "adidas IE", "https://www.adidas.ie/search?q={q}", "EUR", "brand", ["adidas"], r"\.html"),
     Retailer("newbalance_ie", "New Balance IE", "https://www.newbalance.ie/search?q={q}", "EUR", "brand", ["new balance"], "/pd/"),
-    Retailer("zalando_ie", "Zalando IE", "https://www.zalando.ie/catalogue/?q={q}", "EUR", "retailer", [], ".html"),
-    Retailer("footlocker_ie", "Foot Locker IE", "https://www.footlocker.ie/en/search?query={q}", "EUR", "retailer", [], "/product/"),
+    Retailer("zalando_ie", "Zalando IE", "https://www.zalando.ie/catalogue/?q={q}", "EUR", "retailer", [], r"\.html"),
+    Retailer("footlocker_ie", "Foot Locker IE", "https://www.footlocker.ie/en/search?query={q}", "EUR", "retailer", [], "/product/",
+             ["trainers", "boots", "sandals", ""]),
+    Retailer("53north_ie", "53 Degrees North", "https://www.53degreesnorth.ie/search?q={q}", "EUR", "retailer", [], "/products/"),
+    Retailer("ellisbrigham", "Ellis Brigham", "https://www.ellis-brigham.com/search?q={q}", "GBP", "retailer", [], r"-\d{6,}$"),
     Retailer("jdsports_ie", "JD Sports IE", "https://www.jdsports.ie/search/{q}/", "EUR", "retailer", [], "/product/"),
     Retailer("lifestyle_ie", "Life Style Sports", "https://www.lifestylesports.com/ie/search?q={q}", "EUR", "retailer", [], "/ie/"),
     Retailer("asos", "ASOS", "https://www.asos.com/search/?q={q}", "EUR", "retailer", [], "/prd/"),
-    Retailer("end", "END. Clothing", "https://www.endclothing.com/ie/catalogsearch/result/?q={q}", "EUR", "retailer", [], ".html"),
+    Retailer("end", "END. Clothing", "https://www.endclothing.com/ie/catalogsearch/result/?q={q}", "EUR", "retailer", [], r"\.html"),
 ]
 
 

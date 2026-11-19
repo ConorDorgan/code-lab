@@ -16,7 +16,7 @@ from urllib.parse import quote_plus, urljoin, urlparse
 
 from . import config
 from .blockers import Blocked, record
-from .identify import LEVELS, Identification, has_phrase, knowledge, min_level, norm
+from .identify import ITEM_TYPES, LEVELS, Identification, has_phrase, identify_text, knowledge, min_level, norm
 
 # Second-hand marketplaces and resale platforms: not a "buy new at retail" price.
 EXCLUDED_SELLERS = ("ebay", "vinted", "depop", "stockx", "goat", "klekt", "laced", "grailed",
@@ -34,7 +34,7 @@ _NOISE_RE = re.compile(r"(save|you save|off|up to|delivery|shipping|over|under|s
                        r"|[€£]\s?[\d.,]+\s*(off|delivery)", re.I)
 
 
-_TILE_NOISE_RE = re.compile(r"(this item is on sale|price dropped|sale price|was price|now only|rrp)\b.*$", re.I)
+_TILE_NOISE_RE = re.compile(r"(this item is on sale|price dropped|sale price|regular price|unit price|was price|now only|rrp)\b.*$", re.I)
 
 
 def today() -> str:
@@ -135,21 +135,47 @@ def _brand_present(ident: Identification, t: str) -> bool:
     return any(has_phrase(t, a) for a in aliases if a)
 
 
-def match_level(ident: Identification, title: str, brand_site: bool = False) -> str | None:
-    """How well a retail product title matches the identified item: 'high', 'medium' or None."""
+def _url_words(url: str) -> str:
+    return norm(urlparse(url or "").path.replace("-", " ").replace("/", " "))
+
+
+def _type_conflict(ident: Identification, t: str) -> bool:
+    """True if the retail title is clearly a different kind of item (e.g. listing is a jacket,
+    retail product is trousers)."""
+    if not ident.item_type:
+        return False
+    mine = ITEM_TYPES.get(ident.item_type, [])
+    if any(has_phrase(t, w) for w in mine):
+        return False
+    for typ, words in ITEM_TYPES.items():
+        if typ != ident.item_type and any(has_phrase(t, w) for w in words):
+            return True
+    return False
+
+
+def match_level(ident: Identification, title: str, brand_site: bool = False, url: str = "") -> str | None:
+    """How well a retail product (title, plus its URL for the brand) matches the identified item:
+    'high', 'medium' or None."""
     t = norm(title)
     if not t:
         return None
-    if not brand_site and not _brand_present(ident, t):
+    if not brand_site and not _brand_present(ident, f"{t} {_url_words(url)}"):
         return None
     if any(has_phrase(t, w) for w in KIDS_WORDS):
         return None
     if any(has_phrase(t, w) for w in ACCESSORY_WORDS):
         return None
+    if _type_conflict(ident, t):
+        return None
     if ident.model:
         pats, variants = _model_patterns(ident)
         if not any(has_phrase(t, p) for p in pats):
             return None
+        if ident.brand_key and pats != [ident.model]:
+            # Same longest-pattern logic as identification, so "Beta AR" never counts as "Beta".
+            other = identify_text(title, brand_field=ident.brand)
+            if other.model and other.model != ident.model:
+                return None
         if ident.variant:
             wanted = variants.get(ident.variant) or [ident.variant]
             if any(has_phrase(t, v) for v in wanted):
@@ -177,7 +203,7 @@ def choose(offers: list[Offer], ident: Identification, brand_site: bool = False)
     """
     scored = []
     for o in offers:
-        lvl = match_level(ident, o.title, brand_site)
+        lvl = match_level(ident, o.title, brand_site, o.url)
         if lvl:
             o.match = lvl
             scored.append(o)
@@ -236,7 +262,8 @@ def extract_tiles(html: str, page_url: str, url_hint: str = "") -> list[Offer]:
     seen: dict[str, Offer] = {}
     for a in soup.find_all("a", href=True):
         href = urljoin(page_url, a["href"]).split("#")[0]
-        if urlparse(href).netloc != host or (url_hint and url_hint not in href) or "search" in href:
+        path = urlparse(href).path
+        if urlparse(href).netloc != host or (url_hint and not re.search(url_hint, path)) or "search" in path:
             continue
         if href in seen:
             continue
@@ -365,7 +392,7 @@ class PriceFinder:
         if not ld:
             offer.notes.append("price from search results tile (no structured data on product page)")
             return offer
-        if ld["name"] and not match_level(ident, ld["name"], brand_site):
+        if ld["name"] and not match_level(ident, ld["name"], brand_site, offer.url):
             offer.notes.append("product page name didn't match; kept tile price")
             return offer
         if ld["name"]:
@@ -387,10 +414,10 @@ class PriceFinder:
         brand = norm(ident.brand)
         for rt in self.retailers:
             if rt.kind == "brand":
-                if any(norm(b) == brand or norm(b) == ident.brand_key for b in rt.brands):
+                if any(norm(b) in (brand, norm(ident.brand_key)) for b in rt.brands):
                     out.append(("brand", rt))
         for rt in self.retailers:
-            if rt.kind == "retailer":
+            if rt.kind == "retailer" and (not rt.item_types or ident.item_type in rt.item_types):
                 out.append(("retailer", rt))
         return out
 

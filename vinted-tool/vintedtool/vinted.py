@@ -258,13 +258,30 @@ def _norm(s: str) -> str:
     return re.sub(r"[^a-z0-9.]+", " ", (s or "").lower()).strip()
 
 
+def _brand_ok(item: Listing, brands: list[str]) -> bool:
+    from .identify import norm as inorm
+    have = inorm(item.brand)
+    for b in brands:
+        want = inorm(b)
+        if want and (want == have or f" {want} " in f" {have} " or (not have and f" {want} " in f" {inorm(item.title)} ")):
+            return True
+    return False
+
+
 def matches_filters(item: Listing, max_price: float | None = None, size: str | None = None,
-                    brand: str | None = None, conditions: list[str] | None = None) -> bool:
+                    brand: str | list[str] | None = None, conditions: list[str] | None = None,
+                    item_type: str | None = None) -> bool:
     """Client-side filters (brand and size are matched by text; see DECISIONS.md)."""
     if max_price is not None and item.price is not None and item.price > max_price:
         return False
-    if brand and _norm(brand) not in _norm(item.brand) and _norm(brand) not in _norm(item.title):
+    brands = [brand] if isinstance(brand, str) else (brand or [])
+    if brands and not _brand_ok(item, brands):
         return False
+    if item_type:
+        from .identify import detect_item_type, norm as inorm
+        found = detect_item_type(item.category, inorm(item.title))
+        if found and found != item_type:
+            return False
     if size:
         want = _norm(size)
         have = _norm(item.size)
@@ -279,38 +296,67 @@ def matches_filters(item: Listing, max_price: float | None = None, size: str | N
     return True
 
 
-def search(browser, query: str, limit: int = config.DEFAULT_LIMIT, max_price: float | None = None,
-           size: str | None = None, brand: str | None = None, conditions: list[str] | None = None,
-           details: bool = True, max_pages: int = 3) -> list[Listing]:
-    """Search vinted.ie and return up to `limit` filtered listings (optionally with item details)."""
+def search(browser, query: str | list[str], limit: int = config.DEFAULT_LIMIT, max_price: float | None = None,
+           size: str | None = None, brand: str | list[str] | None = None, conditions: list[str] | None = None,
+           details: bool = True, max_pages: int = 3, item_type: str | None = None,
+           must_mention: list[str] | None = None) -> list[Listing]:
+    """Search vinted.ie and return up to `limit` filtered listings (optionally with item details).
+
+    Several queries can be given; their results are merged (round-robin) and de-duplicated.
+    `must_mention` drops listings whose title+description mention none of the given words
+    (checked again after item pages are read)."""
     from .blockers import Blocked
-    results: list[Listing] = []
+    from .identify import has_phrase, norm as inorm
+    queries = [query] if isinstance(query, str) else list(query)
+    brands = [brand] if isinstance(brand, str) else (brand or [])
+    pages_each = max_pages if len(queries) == 1 else 1
+
+    def mentions(it: Listing) -> bool:
+        if not must_mention:
+            return True
+        text = inorm(f"{it.title} {it.description}")
+        return any(has_phrase(text, w) for w in must_mention)
+
+    per_query: list[list[Listing]] = []
     seen: set[int] = set()
-    text = f"{brand} {query}" if brand and _norm(brand) not in _norm(query) else query
-    for page in range(1, max_pages + 1):
-        url = build_search_url(text, max_price, conditions, page)
-        html = browser.fetch(url, site="Vinted search", namespace="vinted_search")
-        batch = parse_catalog(html)
-        if not batch:
-            break
-        new = 0
-        for it in batch:
-            if it.id in seen:
-                continue
-            seen.add(it.id)
-            new += 1
-            if matches_filters(it, max_price, size, brand, conditions):
-                results.append(it)
-                if len(results) >= limit:
-                    break
-        if len(results) >= limit or new == 0:
-            break
+    for q in queries:
+        text = f"{brands[0]} {q}" if len(brands) == 1 and _norm(brands[0]) not in _norm(q) else q
+        found: list[Listing] = []
+        for page in range(1, pages_each + 1):
+            url = build_search_url(text, max_price, conditions, page)
+            html = browser.fetch(url, site="Vinted search", namespace="vinted_search")
+            batch = parse_catalog(html)
+            if not batch:
+                break
+            new = 0
+            for it in batch:
+                if it.id in seen:
+                    continue
+                seen.add(it.id)
+                new += 1
+                if matches_filters(it, max_price, size, brands, conditions, item_type):
+                    found.append(it)
+            if len(found) >= limit or new == 0:
+                break
+        per_query.append(found)
+    # Round-robin so every query is represented; listings that already mention the required
+    # words in their title go first.
+    merged: list[Listing] = []
+    for i in range(max((len(f) for f in per_query), default=0)):
+        for f in per_query:
+            if i < len(f):
+                merged.append(f[i])
+    if must_mention:
+        merged.sort(key=lambda it: not mentions(it))
+    results = merged[: limit if not must_mention else limit * 2]
     if details:
         skipped = 0
         for it in results:
             if browser.is_blocked(it.url):
                 skipped += 1
                 continue
+            if must_mention and len([r for r in results[:results.index(it)] if mentions(r)]) >= limit:
+                break
             try:
                 html = browser.fetch(it.url, site="Vinted item page", namespace="vinted_item",
                                      soft_block_backoff_s=20)
@@ -320,4 +366,9 @@ def search(browser, query: str, limit: int = config.DEFAULT_LIMIT, max_price: fl
             apply_details(it, parse_item(html))
         if skipped:
             print(f"  ! {skipped} item page(s) not read (Vinted bot-check); those rows use search-page data only")
+    if item_type:
+        results = [it for it in results if matches_filters(it, item_type=item_type)]
+    if must_mention:
+        results = [it for it in results if mentions(it)]
+    results = results[:limit]
     return results

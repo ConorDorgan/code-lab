@@ -98,3 +98,37 @@ def test_matches_filters():
     assert not matches_filters(it, conditions=["new_with_tags"])
     letter = Listing(id=2, title="t", url="u", size="M / 38 / 10")
     assert matches_filters(letter, size="M") and not matches_filters(letter, size="L")
+
+
+def test_multi_brand_and_type_filters():
+    arc = Listing(id=1, title="Veste Arc'teryx Beta LT Gore-Tex", url="u", price=90, brand="Arc'teryx")
+    hag = Listing(id=2, title="Haglöfs jacket", url="u", price=80, brand="Haglöfs")
+    pants = Listing(id=3, title="Rab Downpour pants", url="u", price=40, brand="Rab")
+    zara = Listing(id=4, title="Gore-tex jacket", url="u", price=30, brand="Zara")
+    brands = ["Arc'teryx", "Haglofs", "Rab"]
+    assert matches_filters(arc, brand=brands, item_type="jacket")
+    assert matches_filters(hag, brand=brands, item_type="jacket")      # accent-insensitive
+    assert not matches_filters(pants, brand=brands, item_type="jacket")
+    assert not matches_filters(zara, brand=brands)
+
+
+class _FakeBrowser:
+    def __init__(self, html):
+        self.html, self.urls = html, []
+
+    def fetch(self, url, site, **kw):
+        self.urls.append(url)
+        return self.html
+
+    def is_blocked(self, url):
+        return False
+
+
+def test_search_multi_query_must_mention(fixture_text):
+    from vintedtool.vinted import search
+    b = _FakeBrowser(fixture_text(CATALOG))
+    res = search(b, ["salomon xt-6", "salomon gtx"], limit=10, details=False,
+                 must_mention=["gtx", "gore tex"])
+    assert 0 < len(res) <= 10
+    assert all(("gtx" in r.title.lower() or "gore" in r.title.lower() or "gor" in r.title.lower()) for r in res)
+    assert sum("/catalog?" in u for u in b.urls) == 2          # one page per query
