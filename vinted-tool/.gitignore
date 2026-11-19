@@ -1,0 +1,14 @@
+# Secrets and personal session data — never commit
+.env
+.env.*
+!.env.example
+session/
+*.session.json
+
+# Local runtime data
+.venv/
+.cache/
+output/
+__pycache__/
+*.pyc
+.pytest_cache/
