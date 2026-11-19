@@ -152,7 +152,11 @@ def match_level(ident: Identification, title: str, brand_site: bool = False) -> 
             return None
         if ident.variant:
             wanted = variants.get(ident.variant) or [ident.variant]
-            return "high" if any(has_phrase(t, v) for v in wanted) else "medium"
+            if any(has_phrase(t, v) for v in wanted):
+                return "high"
+            others = [v for name, vs in variants.items() if name != ident.variant for v in vs]
+            # Fall back only to the plain base model, never to a different variant.
+            return None if any(has_phrase(t, v) for v in others) else "medium"
         other = [v for vs in variants.values() for v in vs]
         return "medium" if any(has_phrase(t, v) for v in other) else "high"
     if ident.product_line:
@@ -286,9 +290,14 @@ def parse_product_jsonld(html: str) -> dict | None:
             if not offers:
                 continue
             cur_offers = [x for x in offers if x[1] in ("EUR", "GBP")] or offers
-            price, cur, _ = min(cur_offers)
+            prices = [round(x[0], 2) for x in cur_offers]
+            # A ProductGroup lists every size/colourway; use the most common price (the regular
+            # one), not the minimum, which can be another colourway's sale price.
+            price = max(set(prices), key=lambda v: (prices.count(v), v))
+            cur = next(x[1] for x in cur_offers if round(x[0], 2) == price)
             avail = " ".join(x[2] for x in offers).lower()
             return {
+                "all_prices": sorted(set(prices)),
                 "name": node.get("name", ""),
                 "price": price,
                 "currency": cur,
@@ -362,7 +371,9 @@ class PriceFinder:
         if ld["name"]:
             offer.title = ld["name"]
         if ld["currency"] in ("EUR", "GBP"):
-            if abs(ld["price"] - offer.price) > 0.01:
+            if ld["currency"] == offer.currency and round(offer.price, 2) in ld["all_prices"]:
+                ld["price"] = offer.price          # tile price confirmed by the product page
+            elif abs(ld["price"] - offer.price) > 0.01:
                 offer.notes.append(f"product page price {ld['price']:.2f} {ld['currency']} (tile said {offer.price:.2f})")
             offer.price, offer.currency = ld["price"], ld["currency"]
         offer.in_stock = ld["in_stock"]

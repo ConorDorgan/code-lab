@@ -39,8 +39,18 @@ def test_extract_tiles_footlocker(fixture_text):
 
 def test_jsonld_product_page(fixture_text):
     ld = parse_product_jsonld(fixture_text("footlocker_pdp_xt6_gtx.html.gz"))
+    ld.pop("all_prices")
     assert ld == {"name": "Salomon XT-6 GTX - Women Shoes", "price": 199.99, "currency": "EUR",
                   "in_stock": True, "discontinued": False}
+
+
+def test_jsonld_group_uses_most_common_price():
+    html = """<script type="application/ld+json">{"@type":"ProductGroup","name":"Salomon XT-6",
+      "hasVariant":[{"offers":{"price":"179.99","priceCurrency":"EUR","availability":"InStock"}},
+                    {"offers":{"price":"179.99","priceCurrency":"EUR","availability":"InStock"}},
+                    {"offers":{"price":"160.00","priceCurrency":"EUR","availability":"InStock"}}]}</script>"""
+    ld = parse_product_jsonld(html)
+    assert ld["price"] == 179.99 and ld["all_prices"] == [160.0, 179.99]
 
 
 def test_match_levels():
@@ -48,7 +58,8 @@ def test_match_levels():
     assert match_level(plain, "Salomon XT-6 Men Shoes") == "high"
     assert match_level(plain, "Salomon XT-6 GTX Men Shoes") == "medium"     # different variant
     assert match_level(gtx, "Salomon XT-6 GTX - Women Shoes") == "high"
-    assert match_level(gtx, "Salomon XT-6 Men Shoes") == "medium"
+    assert match_level(gtx, "Salomon XT-6 Men Shoes") == "medium"           # base model fallback
+    assert match_level(gtx, "Salomon XT-6 EXPANSE Men Shoes") is None       # never another variant
     assert match_level(plain, "Salomon XT-4 OG") is None                   # different model
     assert match_level(plain, "Nike XT-6") is None                          # wrong brand
     assert match_level(plain, "XT-6", brand_site=True) == "high"            # brand implied on brand site

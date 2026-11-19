@@ -20,6 +20,16 @@ if not os.environ.get("PLAYWRIGHT_BROWSERS_PATH") and Path("/opt/pw-browsers").e
     # Pre-installed browsers in some sandboxes; harmless elsewhere.
     os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "/opt/pw-browsers"
 
+# We only need page HTML: skip heavy assets and ad/tracking calls. Faster, and lighter on every site.
+SKIP_RESOURCE_TYPES = {"image", "media", "font"}
+SKIP_HOST_PARTS = (
+    "doubleclick", "googlesyndication", "googletagmanager", "google-analytics", "googleadservices",
+    "adnxs", "rubiconproject", "criteo", "smartadserver", "connectad", "sharethrough", "lkqd",
+    "id5-sync", "amazon-adsystem", "pubmatic", "casalemedia", "taboola", "outbrain", "facebook",
+    "tiktok", "hotjar", "yieldmo", "openx", "3lift", "teads", "rtbwise", "yellowblue", "adform",
+    "bing.com/bat", "clarity.ms", "onetrust", "quantserve", "scorecardresearch", "adsrvr",
+)
+
 CHALLENGE_MARKERS = (
     "just a moment",
     "enable javascript and cookies to continue",
@@ -83,6 +93,15 @@ class Browser:
         if self.storage_state and Path(self.storage_state).exists():
             kw["storage_state"] = str(self.storage_state)
         self._ctx = self._browser.new_context(**kw)
+        self._ctx.route("**/*", self._route)
+
+    @staticmethod
+    def _route(route):
+        req = route.request
+        url = req.url.lower()
+        if req.resource_type in SKIP_RESOURCE_TYPES or any(h in url for h in SKIP_HOST_PARTS):
+            return route.abort()
+        return route.continue_()
 
     @property
     def context(self):

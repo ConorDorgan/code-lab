@@ -88,3 +88,35 @@ def test_merge_claude_brand_conflict_caps_medium():
     out = merge_claude(i, {"brand": "Nike", "product_line": "Air Max", "model": "Air Max 90", "variant": "",
                            "item_type": "trainers", "colour": "", "confidence": "high", "reason": ""})
     assert out.confidence == "medium" and out.model == ""
+
+
+def test_claude_identifier_request_and_parse(monkeypatch, tmp_path):
+    """No network: replace the SDK call and check what we send and how we read the answer."""
+    import json as _json
+    from types import SimpleNamespace
+    from vintedtool.cache import Cache
+    from vintedtool.identify import ClaudeIdentifier, identify_listing
+    from vintedtool.vinted import Listing
+
+    sent = {}
+
+    def fake_create(**kw):
+        sent.update(kw)
+        body = {"brand": "Salomon", "product_line": "XT", "model": "XT-6", "variant": "GTX",
+                "item_type": "trainers", "colour": "black", "confidence": "high", "reason": "logo + mudguard"}
+        return SimpleNamespace(stop_reason="end_turn", content=[SimpleNamespace(type="text", text=_json.dumps(body))])
+
+    cid = ClaudeIdentifier("test-key", cache=Cache(tmp_path))
+    monkeypatch.setattr(cid.client.messages, "create", fake_create)
+    it = Listing(id=1, title="Chaussures Salmon", url="u", brand="Salomon",
+                 photos=["https://images1.vinted.net/x.webp"])
+    ident = identify_listing(it, cid)
+    assert ident.model == "XT-6" and ident.confidence == "high" and ident.source == "text+photo (Claude)"
+    assert sent["model"] == "claude-opus-5-5"
+    assert sent["output_config"]["format"]["type"] == "json_schema"
+    content = sent["messages"][0]["content"]
+    assert content[0] == {"type": "image", "source": {"type": "url", "url": "https://images1.vinted.net/x.webp"}}
+    # cached: a second call doesn't hit the API
+    sent.clear()
+    identify_listing(it, cid)
+    assert sent == {}
