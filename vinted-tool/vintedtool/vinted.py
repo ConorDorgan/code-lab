@@ -319,12 +319,30 @@ def search(browser, query: str | list[str], limit: int = config.DEFAULT_LIMIT, m
 
     per_query: list[list[Listing]] = []
     seen: set[int] = set()
+    stop_all = False
     for q in queries:
+        if stop_all:
+            break
         text = f"{brands[0]} {q}" if len(brands) == 1 and _norm(brands[0]) not in _norm(q) else q
         found: list[Listing] = []
         for page in range(1, pages_each + 1):
             url = build_search_url(text, max_price, conditions, page)
-            html = browser.fetch(url, site="Vinted search", namespace="vinted_search")
+            if len(queries) > 1:
+                # Several queries: a bot-check on one is skipped (pause, carry on with the rest).
+                try:
+                    html = browser.fetch(url, site="Vinted search", namespace="vinted_search",
+                                         soft_block_backoff_s=20)
+                except Blocked:
+                    if browser.is_blocked(url):
+                        if any(per_query) or found:
+                            print("  ! Vinted keeps blocking searches; continuing with the results so far")
+                            stop_all = True
+                            break
+                        raise
+                    print(f"  ! skipped query “{q}” (Vinted bot-check)")
+                    break
+            else:
+                html = browser.fetch(url, site="Vinted search", namespace="vinted_search")
             batch = parse_catalog(html)
             if not batch:
                 break

@@ -23,3 +23,6 @@ protection: when it meets one it stops that part, logs it here and carries on.
 - 2026-11-19 10:46 — **Salomon IE**: HTTP 403. URL: https://www.salomon.com/en-ie/search?q=Salomon+XT-6
 - 2026-11-19 10:47 — **Zalando IE**: HTTP 403. URL: https://www.zalando.ie/catalogue/?q=Salomon+XT-6
 - 2026-11-19 10:48 — **ASOS**: HTTP 403. URL: https://www.asos.com/search/?q=Salomon+XT-6+S%2FLAB
+- 2026-11-19 11:29 — **Vinted search**: HTTP 403. URL: https://www.vinted.ie/catalog?search_text=nanamica+gore+tex&order=relevance&price_to=100&currency=EUR
+- 2026-11-19 11:30 — **Vinted search**: HTTP 403. URL: https://www.vinted.ie/catalog?search_text=nanamica+gore+tex&order=relevance&price_to=100&currency=EUR
+- 2026-11-19 11:31 — **Vinted search**: HTTP 403 on 3 pages in a row; stopped using this site for the run. URL: https://www.vinted.ie/catalog?search_text=arcteryx+gore+tex&order=relevance&price_to=100&currency=EUR
