@@ -75,3 +75,44 @@ def test_cache_ttl(tmp_path):
     time.sleep(0.01)
     assert c2.get("ns", "k") is None
     assert Cache(tmp_path, enabled=False).get("ns", "k") is None
+
+
+def test_soft_block_skips_page_then_gives_up(tmp_path, monkeypatch):
+    import pytest
+    from vintedtool import browser as br
+    from vintedtool.blockers import Blocked
+    monkeypatch.setattr(br.time, "sleep", lambda s: None)
+    b = br.Browser(cache=Cache(tmp_path), verbose=False)
+    outcomes = iter(["ok", "block", "ok", "block", "block", "block"])
+
+    def fake_live(url, *a):
+        if next(outcomes) == "block":
+            raise Blocked("Vinted item page", url, "HTTP 403")
+        return "<html>ok</html>"
+    monkeypatch.setattr(b, "_fetch_live", fake_live)
+    u = "https://www.vinted.ie/items/{}"
+    assert b.fetch(u.format(1), "Vinted item page", soft_block_backoff_s=20) == "<html>ok</html>"
+    with pytest.raises(Blocked):
+        b.fetch(u.format(2), "Vinted item page", soft_block_backoff_s=20)
+    assert not b.is_blocked(u.format(3))                      # one block: keep going
+    assert b.fetch(u.format(3), "Vinted item page", soft_block_backoff_s=20)
+    for i in (4, 5, 6):
+        with pytest.raises(Blocked):
+            b.fetch(u.format(i), "Vinted item page", soft_block_backoff_s=20)
+    assert b.is_blocked(u.format(7))                          # 3 in a row: stop
+    from vintedtool import config
+    assert "3 pages in a row" in config.BLOCKERS_FILE.read_text()
+
+
+def test_hard_block_marks_host(tmp_path, monkeypatch):
+    import pytest
+    from vintedtool import browser as br
+    from vintedtool.blockers import Blocked
+    b = br.Browser(cache=Cache(tmp_path), verbose=False)
+
+    def fake_live(url, *a):
+        raise Blocked("Zalando IE", url, "HTTP 403")
+    monkeypatch.setattr(b, "_fetch_live", fake_live)
+    with pytest.raises(Blocked):
+        b.fetch("https://www.zalando.ie/a", "Zalando IE")
+    assert b.is_blocked("https://www.zalando.ie/b")

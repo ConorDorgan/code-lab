@@ -186,10 +186,12 @@ def cmd_favourites(args) -> int:
         listings = []
         for h in uniq:
             try:
-                html = b.fetch(h, site="Vinted item page", namespace="vinted_item")
+                html = b.fetch(h, site="Vinted item page", namespace="vinted_item", soft_block_backoff_s=20)
             except Blocked as e:
-                print(f"  ! item page blocked ({e.reason}); stopping item fetches")
-                break
+                if b.is_blocked(h):
+                    print(f"  ! Vinted keeps blocking item pages ({e.reason}); stopping")
+                    break
+                continue
             it = listing_from_item_page(h, html)
             if it:
                 listings.append(it)

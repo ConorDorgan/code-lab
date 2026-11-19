@@ -64,6 +64,7 @@ class Browser:
         self.verbose = verbose
         self._pw = self._browser = self._ctx = None
         self._blocked_hosts: dict[str, str] = {}
+        self._soft_blocks: dict[str, int] = {}
         self.live_requests = 0
 
     def __enter__(self):
@@ -124,11 +125,13 @@ class Browser:
 
     def fetch(self, url: str, site: str, namespace: str = "pages", settle_ms: int = 2500,
               use_cache: bool = True, evaluate: str | None = None, wait_for_prices: bool = False,
-              retry_after_s: float = 0):
+              soft_block_backoff_s: float = 0, soft_block_limit: int = 3):
         """Return page HTML (or the result of `evaluate` JS if given). Cached for 24h.
 
-        Raises Blocked if the site answers with a block/challenge. Once a host has blocked us
-        in this run we don't hit it again.
+        Raises Blocked if the site answers with a block/challenge, and logs it to BLOCKERS.md.
+        Normally a host that blocks us once is not hit again this run; with soft_block_backoff_s
+        the single page is skipped, we pause, and the host is dropped after soft_block_limit
+        blocks in a row.
         """
         cache_key = url + ("|eval:" + evaluate if evaluate else "")
         if use_cache:
@@ -142,20 +145,23 @@ class Browser:
         try:
             result = self._fetch_live(url, site, settle_ms, evaluate, wait_for_prices)
         except Blocked as e:
-            if not retry_after_s:
+            record(site, url, e.reason)
+            if not soft_block_backoff_s:
                 self._blocked_hosts[host] = e.reason
-                record(site, url, e.reason)
                 raise
-            # One polite back-off then a single retry. If it's still blocked, give up for this run.
-            print(f"  ! {site}: {e.reason}; backing off {retry_after_s:.0f}s and retrying once")
-            time.sleep(retry_after_s)
-            try:
-                result = self._fetch_live(url, site, settle_ms, evaluate, wait_for_prices)
-            except Blocked as e2:
-                reason = f"{e2.reason} (also after a {retry_after_s:.0f}s back-off)"
+            # Intermittent bot-check (seen on vinted.ie item pages): skip this page, back off,
+            # and give up on the host only after `soft_block_limit` blocks in a row.
+            n = self._soft_blocks.get(host, 0) + 1
+            self._soft_blocks[host] = n
+            if n >= soft_block_limit:
+                reason = f"{e.reason} on {n} pages in a row"
                 self._blocked_hosts[host] = reason
-                record(site, url, reason)
+                record(site, url, reason + "; stopped using this site for the run")
                 raise Blocked(site, url, reason) from None
+            print(f"  ! {site}: {e.reason}; skipping this page and pausing {soft_block_backoff_s:.0f}s")
+            time.sleep(soft_block_backoff_s)
+            raise
+        self._soft_blocks[host] = 0
         if use_cache:
             self.cache.set(namespace, cache_key, result)
         return result
@@ -175,13 +181,7 @@ class Browser:
             page.wait_for_timeout(settle_ms)
             title, html = page.title(), page.content()
             reason = looks_blocked(status, title, html)
-            if reason and status not in (401, 403, 429):
-                # Some bot checks are non-interactive and finish on their own in a real
-                # browser. Give it a few seconds like a person would; never interact with it.
-                page.wait_for_timeout(8000)
-                title, html = page.title(), page.content()
-                reason = looks_blocked(None, title, html)
-            if reason:
+            if reason:  # never wait on, interact with or retry a challenge page
                 raise Blocked(site, url, reason)
             if wait_for_prices:
                 # Keep both the server-rendered snapshot and the client-rendered one: some shops

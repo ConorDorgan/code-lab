@@ -64,10 +64,16 @@ def test_choose_prefers_best_match_then_eur_then_cheapest(fixture_text):
     assert best.match == "high" and "GTX" in best.title and best.price == 199.99
     plain = choose(offers, xt6())
     assert plain.match == "high" and "GTX" not in plain.title and "EXPANSE" not in plain.title
-    assert plain.price == min(o.price for o in offers if o.match == "high")
+    # regular price (179.99) is used, not a colourway-specific sale price; the sale is noted
+    assert plain.price == 179.99 and plain.original_price is None
+    assert any("on sale new from €120.00" in n for n in plain.notes)
+    only_sale = [o for o in offers if o.original_price]
+    assert choose(only_sale, xt6()).price == 120.0
     eur = Offer("Salomon XT-6", 160, "EUR", "u1", "s", "retailer")
     gbp = Offer("Salomon XT-6", 120, "GBP", "u2", "s", "retailer")
     assert choose([gbp, eur], xt6()) is eur
+    s_lab = identify_text("Salomon S/LAB XT-6", brand_field="Salomon")
+    assert s_lab.variant == "S/LAB" and match_level(s_lab, "Salomon XT-6 Men Shoes") == "medium"
 
 
 def test_serpapi_parsing_filters_used_and_resale(fixture_text):

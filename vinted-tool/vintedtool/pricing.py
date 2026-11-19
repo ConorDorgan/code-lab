@@ -164,17 +164,30 @@ def match_level(ident: Identification, title: str, brand_site: bool = False) -> 
 
 
 def choose(offers: list[Offer], ident: Identification, brand_site: bool = False) -> Offer | None:
-    """Best match level first; then EUR over converted GBP; then the cheapest new price."""
-    best = None
+    """Pick the retail price to compare against.
+
+    Best match level first, then EUR over converted GBP. Within that, the cheapest *regular*
+    (not-on-sale) price: sales are usually limited to particular colourways/sizes, so a sale price
+    would understate what the item normally costs new. If every match is on sale, the cheapest sale
+    price is used. A cheaper sale price is always mentioned in the offer's notes.
+    """
+    scored = []
     for o in offers:
         lvl = match_level(ident, o.title, brand_site)
-        if not lvl:
-            continue
-        o.match = lvl
-        key = (-LEVELS[lvl], o.converted, o.price_eur)
-        if best is None or key < best[0]:
-            best = (key, o)
-    return best[1] if best else None
+        if lvl:
+            o.match = lvl
+            scored.append(o)
+    if not scored:
+        return None
+    top = min((-LEVELS[o.match], o.converted) for o in scored)
+    pool = [o for o in scored if (-LEVELS[o.match], o.converted) == top]
+    regular = [o for o in pool if not o.original_price]
+    best = min(regular or pool, key=lambda o: o.price_eur)
+    cheapest_sale = min((o for o in pool if o.original_price), key=lambda o: o.price_eur, default=None)
+    if cheapest_sale is not None and cheapest_sale is not best and cheapest_sale.price_eur < best.price_eur:
+        best.notes.append(f"some versions on sale new from €{cheapest_sale.price_eur:.2f} "
+                          f"({cheapest_sale.title[:60]}, {cheapest_sale.url})")
+    return best
 
 
 # ------------------------------------------------------------------ parsers

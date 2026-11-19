@@ -289,7 +289,7 @@ def search(browser, query: str, limit: int = config.DEFAULT_LIMIT, max_price: fl
     text = f"{brand} {query}" if brand and _norm(brand) not in _norm(query) else query
     for page in range(1, max_pages + 1):
         url = build_search_url(text, max_price, conditions, page)
-        html = browser.fetch(url, site="Vinted search", namespace="vinted_search", retry_after_s=45)
+        html = browser.fetch(url, site="Vinted search", namespace="vinted_search")
         batch = parse_catalog(html)
         if not batch:
             break
@@ -306,12 +306,18 @@ def search(browser, query: str, limit: int = config.DEFAULT_LIMIT, max_price: fl
         if len(results) >= limit or new == 0:
             break
     if details:
+        skipped = 0
         for it in results:
+            if browser.is_blocked(it.url):
+                skipped += 1
+                continue
             try:
                 html = browser.fetch(it.url, site="Vinted item page", namespace="vinted_item",
-                                     retry_after_s=45)
-            except Blocked as e:
-                print(f"  ! item details blocked ({e.reason}); continuing with search-page data only")
-                break
+                                     soft_block_backoff_s=20)
+            except Blocked:
+                skipped += 1
+                continue
             apply_details(it, parse_item(html))
+        if skipped:
+            print(f"  ! {skipped} item page(s) not read (Vinted bot-check); those rows use search-page data only")
     return results

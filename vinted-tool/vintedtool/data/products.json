@@ -5,7 +5,7 @@
     "aliases": ["salomon"],
     "lines": {
       "XT": {"patterns": ["xt"], "models": {
-        "XT-6": {"patterns": ["xt6"], "variants": {"GTX": ["gtx", "gore tex", "goretex", "gor tex"], "Expanse": ["expanse"], "Mindful": ["mindful"], "Advanced": ["advanced", "adv"], "Protective": ["protective"], "Recut": ["recut"]}},
+        "XT-6": {"patterns": ["xt6"], "variants": {"GTX": ["gtx", "gore tex", "goretex", "gor tex"], "Expanse": ["expanse"], "Mindful": ["mindful"], "Advanced": ["advanced", "adv"], "Protective": ["protective"], "Recut": ["recut"], "S/LAB": ["s lab", "slab"]}},
         "XT-4": {"patterns": ["xt4"], "variants": {"OG": ["og"], "Advanced": ["advanced", "adv"]}},
         "XT-Wings 2": {"patterns": ["xt wings 2", "xtwings 2", "xt wings"]},
         "XT-Quest": {"patterns": ["xt quest"]},
