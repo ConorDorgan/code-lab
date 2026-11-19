@@ -384,8 +384,9 @@ def search(browser, query: str | list[str], limit: int = config.DEFAULT_LIMIT, m
             apply_details(it, parse_item(html))
         if skipped:
             print(f"  ! {skipped} item page(s) not read (Vinted bot-check); those rows use search-page data only")
-    if item_type:
-        results = [it for it in results if matches_filters(it, item_type=item_type)]
+    # Re-check with what the item pages added (real brand field, category).
+    if item_type or brands:
+        results = [it for it in results if matches_filters(it, brand=brands or None, item_type=item_type)]
     if must_mention:
         results = [it for it in results if mentions(it)]
     results = results[:limit]

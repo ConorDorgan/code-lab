@@ -115,6 +115,8 @@ ITEM_TYPES = {
     "skirt": ["skirt", "jupe"],
     "bag": ["bag", "backpack", "rucksack", "sac", "tote"],
     "hat": ["hat", "cap", "beanie", "bonnet", "casquette"],
+    "gloves": ["gloves", "glove", "mittens", "mitts", "gants", "guantes", "handschuhe", "guanti"],
+    "book": ["book", "livre", "buch", "libro"],
 }
 
 FOOTWEAR_TYPES = {"trainers", "boots", "sandals"}

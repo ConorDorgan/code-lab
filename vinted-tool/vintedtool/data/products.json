@@ -1662,17 +1662,50 @@
      "Falketind GORE-TEX Jacket": {
       "patterns": [
        "falketind"
-      ]
+      ],
+      "variants": {
+       "Pro Light": [
+        "pro light"
+       ],
+       "Paclite": [
+        "paclite"
+       ],
+       "Thermo": [
+        "thermo"
+       ]
+      }
      },
      "Lofoten GORE-TEX Pro Jacket": {
       "patterns": [
        "lofoten"
-      ]
+      ],
+      "variants": {
+       "Pro Light": [
+        "pro light"
+       ],
+       "Paclite": [
+        "paclite"
+       ],
+       "Thermo": [
+        "thermo"
+       ]
+      }
      },
      "Trollveggen GORE-TEX Pro Jacket": {
       "patterns": [
        "trollveggen"
-      ]
+      ],
+      "variants": {
+       "Pro Light": [
+        "pro light"
+       ],
+       "Paclite": [
+        "paclite"
+       ],
+       "Thermo": [
+        "thermo"
+       ]
+      }
      },
      "Bitihorn Jacket": {
       "patterns": [

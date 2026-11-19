@@ -26,3 +26,12 @@ protection: when it meets one it stops that part, logs it here and carries on.
 - 2026-11-19 11:29 — **Vinted search**: HTTP 403. URL: https://www.vinted.ie/catalog?search_text=nanamica+gore+tex&order=relevance&price_to=100&currency=EUR
 - 2026-11-19 11:30 — **Vinted search**: HTTP 403. URL: https://www.vinted.ie/catalog?search_text=nanamica+gore+tex&order=relevance&price_to=100&currency=EUR
 - 2026-11-19 11:31 — **Vinted search**: HTTP 403 on 3 pages in a row; stopped using this site for the run. URL: https://www.vinted.ie/catalog?search_text=arcteryx+gore+tex&order=relevance&price_to=100&currency=EUR
+- 2026-11-19 11:47 — **Vinted search**: HTTP 403. URL: https://www.vinted.ie/catalog?search_text=rab+gore+tex&order=relevance&price_to=100&currency=EUR
+- 2026-11-19 11:48 — **Vinted item page**: HTTP 403. URL: https://www.vinted.ie/items/10651976387-veste-montbell-gore-tex-s-femme-rose-impermeable
+- 2026-11-19 11:53 — **Zalando IE**: HTTP 403. URL: https://www.zalando.ie/catalogue/?q=Patagonia+Calcite+Jacket
+- 2026-11-19 11:54 — **ASOS**: HTTP 403. URL: https://www.asos.com/search/?q=Patagonia+Calcite+Jacket
+- 2026-11-19 11:57 — **Vinted search**: HTTP 403. URL: https://www.vinted.ie/catalog?search_text=rab+gore+tex&order=relevance&price_to=100&currency=EUR
+- 2026-11-19 11:58 — **Vinted item page**: HTTP 403. URL: https://www.vinted.ie/items/10651976387-veste-montbell-gore-tex-s-femme-rose-impermeable
+- 2026-11-19 11:58 — **Vinted item page**: HTTP 403 on 3 pages in a row; stopped using this site for the run. URL: https://www.vinted.ie/items/10651976387-veste-montbell-gore-tex-s-femme-rose-impermeable
+- 2026-11-19 11:58 — **Zalando IE**: HTTP 403. URL: https://www.zalando.ie/catalogue/?q=Patagonia+Calcite+Jacket
+- 2026-11-19 11:58 — **ASOS**: HTTP 403. URL: https://www.asos.com/search/?q=Patagonia+Calcite+Jacket
