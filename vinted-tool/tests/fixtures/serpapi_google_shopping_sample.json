@@ -1,0 +1,14 @@
+{
+  "_comment": "Hand-made sample in SerpAPI's google_shopping response shape (no SERPAPI_KEY was available to capture a real one). Used only to test parsing/filtering.",
+  "search_metadata": {"status": "Success"},
+  "shopping_results": [
+    {"position": 1, "title": "Salomon XT-6 Sneakers - Black/Black/Phantom", "price": "€180.00", "extracted_price": 180.0, "source": "Salomon IE", "link": "https://www.salomon.com/en-ie/shop-emea/product/xt-6-L41086600.html"},
+    {"position": 2, "title": "Salomon XT-6 GTX Unisex", "price": "€200.00", "extracted_price": 200.0, "source": "Example Sports IE", "link": "https://shop.example.ie/salomon-xt-6-gtx"},
+    {"position": 3, "title": "Salomon XT-6 black size 42", "price": "€95.00", "extracted_price": 95.0, "source": "eBay", "link": "https://www.ebay.ie/itm/1"},
+    {"position": 4, "title": "Salomon XT-6", "price": "€110.00", "extracted_price": 110.0, "source": "Some Shop", "second_hand_condition": "used", "link": "https://used.example.com/1"},
+    {"position": 5, "title": "Salomon XT-6 Trainers", "price": "£150.00", "extracted_price": 150.0, "source": "Example UK", "link": "https://uk.example.co.uk/xt6"},
+    {"position": 6, "title": "Salomon XT-6 Kids", "price": "€90.00", "extracted_price": 90.0, "source": "Example Kids", "link": "https://kids.example.ie/xt6"},
+    {"position": 7, "title": "Salomon XT-6", "price": "€310.00", "extracted_price": 310.0, "source": "StockX", "link": "https://stockx.com/salomon-xt-6"},
+    {"position": 8, "title": "Salomon XT-6 Expanse", "price": "€150.00", "extracted_price": 150.0, "source": "Example Sports IE", "link": "https://shop.example.ie/xt-6-expanse"}
+  ]
+}

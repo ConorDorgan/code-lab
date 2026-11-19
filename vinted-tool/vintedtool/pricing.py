@@ -26,11 +26,11 @@ KIDS_WORDS = ("kids", "kid", "junior", "juniors", "youth", "toddler", "toddlers"
               "baby", "child", "children", "enfant", "enfants", "gs", "ps", "td", "little kids", "big kids")
 ACCESSORY_WORDS = ("laces", "insole", "insoles", "socks", "cleaner", "shoe care", "keyring", "sticker")
 
-_PRICE_RE = re.compile(
-    r"(?P<c1>[€£])\s?(?P<n1>\d{1,5}(?:[.,]\d{3})*(?:[.,]\d{1,2})?)"
-    r"|(?P<n2>\d{1,5}(?:[.,]\d{3})*(?:[.,]\d{1,2})?)\s?(?P<c2>[€£]|EUR|GBP)"
-)
-_NOISE_RE = re.compile(r"(save|you save|off|up to|from|delivery|shipping|over|under|spend)\s*[€£]\s?[\d.,]+"
+_NUM = r"\d{1,5}(?:[.,]\d{3})*(?:[.,]\d{1,2})?"
+_PREFIX_PRICE_RE = re.compile(rf"(?P<c>[€£])\s?(?P<n>{_NUM})")
+_SUFFIX_PRICE_RE = re.compile(rf"(?<![\d.,])(?P<n>{_NUM})\s?(?P<c>[€£]|EUR\b|GBP\b)")
+_PRICE_RE = re.compile(rf"[€£]\s?{_NUM}|{_NUM}\s?(?:[€£]|EUR\b|GBP\b)")
+_NOISE_RE = re.compile(r"(save|you save|off|up to|delivery|shipping|over|under|spend)\s*[€£]\s?[\d.,]+"
                        r"|[€£]\s?[\d.,]+\s*(off|delivery)", re.I)
 
 
@@ -59,11 +59,19 @@ def parse_amount(s: str) -> float | None:
 def find_prices(text: str) -> list[tuple[float, str]]:
     """All (amount, currency) pairs in a snippet, ignoring 'save €20'-style noise."""
     text = _NOISE_RE.sub(" ", text or "")
+    found: list[tuple[int, float, str]] = []
+    taken: list[tuple[int, int]] = []
+    # "€ 199,99" (symbol first) wins over "199,99 €"; a symbol already used as a prefix can't
+    # also be a suffix, so "XT-6 € 199,99" is 199.99, not 6.
+    for m in _PREFIX_PRICE_RE.finditer(text):
+        found.append((m.start(), parse_amount(m.group("n")), m.group("c")))
+        taken.append(m.span())
+    for m in _SUFFIX_PRICE_RE.finditer(text):
+        if any(a < m.end() and m.start() < b for a, b in taken):
+            continue
+        found.append((m.start(), parse_amount(m.group("n")), m.group("c")))
     out = []
-    for m in _PRICE_RE.finditer(text):
-        cur = m.group("c1") or m.group("c2")
-        num = m.group("n1") or m.group("n2")
-        amt = parse_amount(num)
+    for _, amt, cur in sorted(found):
         if amt is None or amt < 1:
             continue
         out.append((amt, "GBP" if cur in ("£", "GBP") else "EUR"))
