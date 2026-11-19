@@ -98,11 +98,33 @@ class Browser:
             self._pw.stop()
         self._pw = self._browser = self._ctx = None
 
+    @staticmethod
+    def _wait_for_prices(page, max_ms: int = 15000) -> None:
+        """Client-rendered shops fill in product tiles after load. Scroll a little and wait until
+        the number of linked prices on the page stops growing (or max_ms passes)."""
+        js = """() => { let n = 0; for (const a of document.querySelectorAll('a[href]')) {
+            const t = (a.closest('li,article,div') || a).innerText || '';
+            if (/[€£]\\s?\\d/.test(t)) n++; } return n; }"""
+        last, stable, waited = -1, 0, 0
+        while waited < max_ms:
+            try:
+                page.mouse.wheel(0, 1200)
+                n = page.evaluate(js)
+            except Exception:
+                return
+            stable = stable + 1 if n == last and n > 0 else 0
+            if stable >= 2:
+                return
+            last = n
+            page.wait_for_timeout(1000)
+            waited += 1000
+
     def is_blocked(self, url: str) -> bool:
         return urlparse(url).netloc in self._blocked_hosts
 
     def fetch(self, url: str, site: str, namespace: str = "pages", settle_ms: int = 2500,
-              use_cache: bool = True, evaluate: str | None = None):
+              use_cache: bool = True, evaluate: str | None = None, wait_for_prices: bool = False,
+              retry_after_s: float = 0):
         """Return page HTML (or the result of `evaluate` JS if given). Cached for 24h.
 
         Raises Blocked if the site answers with a block/challenge. Once a host has blocked us
@@ -117,6 +139,28 @@ class Browser:
         if host in self._blocked_hosts:
             raise Blocked(site, url, self._blocked_hosts[host])
 
+        try:
+            result = self._fetch_live(url, site, settle_ms, evaluate, wait_for_prices)
+        except Blocked as e:
+            if not retry_after_s:
+                self._blocked_hosts[host] = e.reason
+                record(site, url, e.reason)
+                raise
+            # One polite back-off then a single retry. If it's still blocked, give up for this run.
+            print(f"  ! {site}: {e.reason}; backing off {retry_after_s:.0f}s and retrying once")
+            time.sleep(retry_after_s)
+            try:
+                result = self._fetch_live(url, site, settle_ms, evaluate, wait_for_prices)
+            except Blocked as e2:
+                reason = f"{e2.reason} (also after a {retry_after_s:.0f}s back-off)"
+                self._blocked_hosts[host] = reason
+                record(site, url, reason)
+                raise Blocked(site, url, reason) from None
+        if use_cache:
+            self.cache.set(namespace, cache_key, result)
+        return result
+
+    def _fetch_live(self, url, site, settle_ms, evaluate, wait_for_prices):
         self._ensure()
         if self.live_requests:
             polite_sleep()
@@ -127,6 +171,7 @@ class Browser:
         try:
             resp = page.goto(url, wait_until="domcontentloaded", timeout=45000)
             status = resp.status if resp else None
+            early = page.content() if wait_for_prices else ""
             page.wait_for_timeout(settle_ms)
             title, html = page.title(), page.content()
             reason = looks_blocked(status, title, html)
@@ -137,12 +182,13 @@ class Browser:
                 title, html = page.title(), page.content()
                 reason = looks_blocked(None, title, html)
             if reason:
-                self._blocked_hosts[host] = reason
-                record(site, url, reason)
                 raise Blocked(site, url, reason)
+            if wait_for_prices:
+                # Keep both the server-rendered snapshot and the client-rendered one: some shops
+                # render tiles server-side and then replace them client-side, others the reverse.
+                self._wait_for_prices(page)
+                html = early + "\n<!-- client-rendered snapshot -->\n" + page.content()
             result = page.evaluate(evaluate) if evaluate else html
         finally:
             page.close()
-        if use_cache:
-            self.cache.set(namespace, cache_key, result)
         return result

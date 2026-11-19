@@ -161,6 +161,11 @@ def parse_item(html: str) -> dict:
                 d.setdefault("brand", b.get("name", ""))
             if ld.get("image"):
                 d.setdefault("image", ld["image"])
+            offers = ld.get("offers") or {}
+            if isinstance(offers, dict):
+                d["price"] = _money(offers.get("price"))
+                d["currency"] = offers.get("priceCurrency", "EUR")
+                d["url"] = offers.get("url", "")
             break
     for plugins in iter_objects_after(flight, "plugins", "["):
         if not isinstance(plugins, list) or not plugins or not isinstance(plugins[0], dict):
@@ -205,6 +210,18 @@ def parse_item(html: str) -> dict:
             d["shipping"] = 0.0 if sh.get("isFree") else _money(sh.get("finalPrice"))
         break
     return d
+
+
+def listing_from_item_page(url: str, html: str) -> Listing | None:
+    """Build a Listing from an item page alone (used for favourites)."""
+    d = parse_item(html)
+    m = re.search(r"/items/(\d+)", url)
+    if not d.get("title") or not m:
+        return None
+    photos = d.get("photos") or ([d["image"]] if d.get("image") else [])
+    it = Listing(id=int(m.group(1)), title=d["title"], url=d.get("url") or url, price=d.get("price"),
+                 currency=d.get("currency", "EUR"), thumbnail=photos[0] if photos else "")
+    return apply_details(it, d)
 
 
 def apply_details(listing: Listing, details: dict) -> Listing:
@@ -272,7 +289,7 @@ def search(browser, query: str, limit: int = config.DEFAULT_LIMIT, max_price: fl
     text = f"{brand} {query}" if brand and _norm(brand) not in _norm(query) else query
     for page in range(1, max_pages + 1):
         url = build_search_url(text, max_price, conditions, page)
-        html = browser.fetch(url, site="Vinted search", namespace="vinted_search")
+        html = browser.fetch(url, site="Vinted search", namespace="vinted_search", retry_after_s=45)
         batch = parse_catalog(html)
         if not batch:
             break
@@ -291,7 +308,8 @@ def search(browser, query: str, limit: int = config.DEFAULT_LIMIT, max_price: fl
     if details:
         for it in results:
             try:
-                html = browser.fetch(it.url, site="Vinted item page", namespace="vinted_item")
+                html = browser.fetch(it.url, site="Vinted item page", namespace="vinted_item",
+                                     retry_after_s=45)
             except Blocked as e:
                 print(f"  ! item details blocked ({e.reason}); continuing with search-page data only")
                 break
